@@ -1,6 +1,6 @@
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
-function ErrorPoll() {
+function PollError() {
   const err = useRouteError();
   let errorMessage: string;
 
@@ -22,4 +22,4 @@ function ErrorPoll() {
   );
 }
 
-export default ErrorPoll;
+export default PollError;

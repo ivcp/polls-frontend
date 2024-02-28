@@ -4,19 +4,20 @@ import {
   createRoutesFromElements,
 } from 'react-router-dom';
 import Layout from './Layout';
-import Polls from './Polls';
-import PollDetails from './PollDetails';
+import Polls from './pages/Home';
+import PollDetails from './pages/Poll';
 import pollService from './services/polls';
-import ErrorPoll from './Error';
+import PollError from './pages/Poll/PollError';
+('./pages/Poll');
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
-      <Route path="polls" element={<Polls />} />
+      <Route index element={<Polls />} />
       <Route
         path="/poll/:pollID"
         element={<PollDetails />}
-        errorElement={<ErrorPoll />}
+        errorElement={<PollError />}
         loader={async ({ params }) => {
           if (params.pollID !== undefined) {
             return await pollService.getPoll(params.pollID);

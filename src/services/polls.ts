@@ -1,4 +1,4 @@
-interface Poll {
+export interface Poll {
   id: string;
   question: string;
   description: string;

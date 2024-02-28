@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import pollService from './services/polls';
+import pollService from '../../services/polls';
+import PollCard from './components/PollCard';
 
 export default function Polls() {
   const { isError, error, isSuccess, data } = useQuery({
@@ -12,7 +13,12 @@ export default function Polls() {
   }
   return (
     <div>
-      {isSuccess && data.polls.map((poll) => <p key={poll.id}>{poll.id}</p>)}
+      <div>
+        <h1>Title</h1>
+        <button>Create poll</button>
+      </div>
+      {isSuccess &&
+        data.polls.map((poll) => <PollCard key={poll.id} poll={poll} />)}
     </div>
   );
 }
