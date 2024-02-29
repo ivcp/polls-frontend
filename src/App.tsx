@@ -18,7 +18,7 @@ const theme = createTheme({});
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={theme} defaultColorScheme="dark">
         <RouterProvider router={router}></RouterProvider>
       </MantineProvider>
       <ReactQueryDevtools initialIsOpen={false} />

@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../../services/polls';
 import PollCard from './components/PollCard';
+import { Button } from '@mantine/core';
+import classes from './index.module.css';
 
 export default function Polls() {
   const { isError, error, isSuccess, data } = useQuery({
@@ -12,14 +14,15 @@ export default function Polls() {
     return <div>Error: {error.message}</div>;
   }
   return (
-    <div>
-      <div>
-        <h1>Title</h1>
+    <div className={classes.container}>
+      <div className={classes.titleContainer}>
         <p>Create a poll and share with others.</p>
-        <button>Create poll</button>
+        <Button size="lg">Create poll</Button>
       </div>
-      {isSuccess &&
-        data.polls.map((poll) => <PollCard key={poll.id} poll={poll} />)}
+      <div>
+        {isSuccess &&
+          data.polls.map((poll) => <PollCard key={poll.id} poll={poll} />)}
+      </div>
     </div>
   );
 }
