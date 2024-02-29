@@ -15,6 +15,7 @@ export default function Polls() {
     <div>
       <div>
         <h1>Title</h1>
+        <p>Create a poll and share with others.</p>
         <button>Create poll</button>
       </div>
       {isSuccess &&
