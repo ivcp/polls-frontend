@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/" },
+    { "source": "/poll/:match*", "destination": "/" },
+    { "source": "/v1/:match*", "destination": "http://3.75.231.58/v1/:match*" }
+  ]
+}
