@@ -13,7 +13,9 @@ const queryClient = new QueryClient({
   },
 });
 
-const theme = createTheme({});
+const theme = createTheme({
+  fontFamily: 'Open Sans, sans-serif',
+});
 
 function App() {
   return (
