@@ -1,7 +1,8 @@
+import '@mantine/core/styles.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-
 import { RouterProvider } from 'react-router-dom';
+import { MantineProvider, createTheme } from '@mantine/core';
 import router from './router';
 
 const queryClient = new QueryClient({
@@ -12,10 +13,14 @@ const queryClient = new QueryClient({
   },
 });
 
+const theme = createTheme({});
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router}></RouterProvider>
+      <MantineProvider theme={theme}>
+        <RouterProvider router={router}></RouterProvider>
+      </MantineProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
