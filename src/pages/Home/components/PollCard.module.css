@@ -6,7 +6,10 @@
   padding: 2rem;
 }
 
-.options {
-  align-self: flex-start;
-  margin-left: 2rem;
+.radioGroup {
+  margin-inline: 1rem;
+}
+
+.radioGroup :not(:last-child) {
+  margin-bottom: 0.5rem;
 }
