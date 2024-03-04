@@ -1,18 +1,22 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../../services/polls';
 import PollCard from './components/PollCard';
-import { Button, Grid } from '@mantine/core';
+import { Button, Grid, Pagination } from '@mantine/core';
 import classes from './index.module.css';
 
 export default function Polls() {
+  const [activePage, setPage] = useState(1);
+
   const { isError, error, isSuccess, data } = useQuery({
-    queryKey: ['polls'],
-    queryFn: pollService.listPolls,
+    queryKey: ['polls', activePage],
+    queryFn: pollService.listPolls.bind(null, activePage),
   });
 
   if (isError) {
     return <div>Error: {error.message}</div>;
   }
+
   return (
     <div className={classes.container}>
       <div className={classes.titleContainer}>
@@ -27,6 +31,14 @@ export default function Polls() {
             </Grid.Col>
           ))}
       </Grid>
+      {isSuccess && (
+        <Pagination
+          className={classes.pagination}
+          total={data.metadata.last_page}
+          value={activePage}
+          onChange={setPage}
+        ></Pagination>
+      )}
     </div>
   );
 }

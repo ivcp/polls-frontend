@@ -28,8 +28,8 @@ export interface PollResult {
   poll: Poll;
 }
 
-const listPolls = async (): Promise<PollResults> => {
-  const response = await fetch(`/v1/polls${''}`);
+const listPolls = async (page: number): Promise<PollResults> => {
+  const response = await fetch(`/v1/polls${'?page=' + page}`);
   if (!response.ok) {
     const err: { error: string } = await response.json();
     throw new Error(err.error);
