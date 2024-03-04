@@ -28,6 +28,10 @@ export interface PollResult {
   poll: Poll;
 }
 
+interface VoteResult {
+  message: string;
+}
+
 const listPolls = async (page: number): Promise<PollResults> => {
   const response = await fetch(`/v1/polls${'?page=' + page}`);
   if (!response.ok) {
@@ -46,7 +50,19 @@ const getPoll = async (pollID: string): Promise<PollResult> => {
   return await response.json();
 };
 
+const vote = async (pollID: string, optionID: string): Promise<VoteResult> => {
+  const response = await fetch(`/v1/polls/${pollID}/options/${optionID}`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    const err: { error: string } = await response.json();
+    throw new Error(err.error);
+  }
+  return await response.json();
+};
+
 export default {
   listPolls,
   getPoll,
+  vote,
 };

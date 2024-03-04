@@ -6,10 +6,23 @@
   padding: 2rem;
 }
 
+.container a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .radioGroup {
   margin-inline: 1rem;
 }
 
 .radioGroup :not(:last-child) {
   margin-bottom: 0.5rem;
+}
+
+.seeMore {
+  opacity: 0.6;
+}
+
+.seeMore:hover {
+  opacity: 1;
 }

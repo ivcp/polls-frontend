@@ -15,7 +15,7 @@ const router = createBrowserRouter(
     <Route path="/" element={<Layout />}>
       <Route index element={<Polls />} />
       <Route
-        path="/poll/:pollID"
+        path="/:pollID"
         element={<PollDetails />}
         errorElement={<PollError />}
         loader={async ({ params }) => {
