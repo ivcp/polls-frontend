@@ -7,7 +7,6 @@ import classes from './index.module.css';
 
 export default function Polls() {
   const [activePage, setPage] = useState(1);
-
   const { isError, error, isSuccess, data } = useQuery({
     queryKey: ['polls', activePage],
     queryFn: pollService.listPolls.bind(null, activePage),
@@ -24,6 +23,9 @@ export default function Polls() {
         <Button size="lg">Create poll</Button>
       </div>
       <Grid>
+        {isSuccess && data.polls.length === 0 && (
+          <p>There are currently no polls. Be the first to create one!</p>
+        )}
         {isSuccess &&
           data.polls.map((poll) => (
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }} key={poll.id}>
@@ -31,7 +33,7 @@ export default function Polls() {
             </Grid.Col>
           ))}
       </Grid>
-      {isSuccess && (
+      {isSuccess && data.polls.length > 0 && (
         <Pagination
           className={classes.pagination}
           total={data.metadata.last_page}
