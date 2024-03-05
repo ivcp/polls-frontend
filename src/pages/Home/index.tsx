@@ -7,14 +7,10 @@ import classes from './index.module.css';
 
 export default function Polls() {
   const [activePage, setPage] = useState(1);
-  const { isError, error, isSuccess, data } = useQuery({
+  const { isError, isLoading, error, isSuccess, data } = useQuery({
     queryKey: ['polls', activePage],
     queryFn: pollService.listPolls.bind(null, activePage),
   });
-
-  if (isError) {
-    return <div>Error: {error.message}</div>;
-  }
 
   return (
     <div className={classes.container}>
@@ -23,6 +19,8 @@ export default function Polls() {
         <Button size="lg">Create poll</Button>
       </div>
       <Grid>
+        {isLoading && <p>getting polls...</p>}
+        {isError && <p>Error: {error.message}</p>}
         {isSuccess && data.polls.length === 0 && (
           <p>There are currently no polls. Be the first to create one!</p>
         )}

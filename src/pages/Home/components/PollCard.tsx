@@ -18,6 +18,7 @@ import { BarChart } from '@mantine/charts';
 
 const PollCard = ({ poll }: { poll: Poll }) => {
   const [selectedOption, setSelectedOption] = useState('');
+  const [showResults, setShowResults] = useState(false);
 
   const mutation = useMutation({
     mutationFn: (optionID: string) => pollService.vote(poll.id, optionID),
@@ -53,6 +54,18 @@ const PollCard = ({ poll }: { poll: Poll }) => {
     }
   }
 
+  let chartHeight = 80;
+
+  if (isResultsSuccess) {
+    resultsData.results.length > 2 &&
+      (chartHeight = 40 * (resultsData.results.length - 2) + 80);
+  }
+  const tickFormatter = (value: string) => {
+    const limit = 18;
+    if (value.length < limit) return value;
+    return `${value.substring(0, limit)}...`;
+  };
+
   return (
     <Card shadow="sm" className={classes.container}>
       <Card.Section>
@@ -61,8 +74,7 @@ const PollCard = ({ poll }: { poll: Poll }) => {
         </Link>
       </Card.Section>
       <Card.Section w={'100%'}>
-        {isResultsError && <p>{resultsError.message}</p>}
-        {!isResultsSuccess ? (
+        {!showResults ? (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -95,28 +107,43 @@ const PollCard = ({ poll }: { poll: Poll }) => {
                 ) : (
                   <Button type="submit">Vote</Button>
                 )}
-                <Button variant={'light'} onClick={() => refetch()}>
+                <Button
+                  variant={'light'}
+                  onClick={() => {
+                    refetch();
+                    setShowResults(true);
+                  }}
+                >
                   Results
                 </Button>
               </Group>
             </Stack>
           </form>
         ) : (
-          <BarChart
-            h={80}
-            withXAxis={false}
-            tickLine="none"
-            gridAxis="none"
-            data={resultsData.results}
-            dataKey="value"
-            series={[{ name: 'vote_count', color: 'blue.6' }]}
-            orientation="vertical"
-            barProps={{
-              radius: [0, 8, 8, 0],
-              label: { fill: '#eeeeee', fontSize: 14, fontWeight: 600 },
-            }}
-            withTooltip={false}
-          />
+          <div>
+            <p className={classes.close} onClick={() => setShowResults(false)}>
+              &#8592;
+            </p>
+            {isResultsError && <p>{resultsError.message}</p>}
+            {isResultsSuccess && (
+              <BarChart
+                h={chartHeight}
+                withXAxis={false}
+                tickLine="none"
+                gridAxis="none"
+                data={resultsData.results}
+                dataKey="value"
+                series={[{ name: 'vote_count', color: 'blue.6' }]}
+                orientation="vertical"
+                barProps={{
+                  radius: [0, 8, 8, 0],
+                  label: { fill: '#eeeeee', fontSize: 14, fontWeight: 600 },
+                }}
+                withTooltip={false}
+                yAxisProps={{ tickFormatter, tickSize: 0 }}
+              />
+            )}
+          </div>
         )}
       </Card.Section>
       <Link to={`/${poll.id}`}>

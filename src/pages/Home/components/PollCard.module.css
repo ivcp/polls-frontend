@@ -30,3 +30,14 @@
 .donut {
   margin-inline: auto;
 }
+
+:global(.recharts-surface) {
+  overflow: visible;
+}
+
+.close {
+  position: absolute;
+  bottom: 0.8rem;
+  left: 4rem;
+  cursor: pointer;
+}
