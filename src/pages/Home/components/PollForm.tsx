@@ -35,6 +35,7 @@ const PollForm = ({
   setSelectedOption,
   refetch,
 }: PollFormProps) => {
+  const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
     <form
       onSubmit={(e) => {
@@ -50,7 +51,7 @@ const PollForm = ({
           value={selectedOption}
           onChange={setSelectedOption}
         >
-          {poll.options.map((opt) => (
+          {options.map((opt) => (
             <Radio key={opt.id} value={opt.id} label={opt.value} />
           ))}
         </RadioGroup>

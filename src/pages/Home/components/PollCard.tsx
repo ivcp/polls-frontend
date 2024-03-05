@@ -96,7 +96,9 @@ const PollCard = ({ poll }: { poll: Poll }) => {
                 withXAxis={false}
                 tickLine="none"
                 gridAxis="none"
-                data={resultsData.results}
+                data={[...resultsData.results].sort(
+                  (a, b) => a.position - b.position
+                )}
                 dataKey="value"
                 series={[{ name: 'vote_count', color: 'blue.6' }]}
                 orientation="vertical"
