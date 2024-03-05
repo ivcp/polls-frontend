@@ -8,6 +8,7 @@ import Polls from './pages/Home';
 import PollDetails from './pages/Poll';
 import pollService from './services/polls';
 import PollError from './pages/Poll/PollError';
+import CreatePoll from './pages/CreatePoll';
 ('./pages/Poll');
 
 const router = createBrowserRouter(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
           }
         }}
       />
+      <Route path="/new" element={<CreatePoll />} />
     </Route>
   )
 );
