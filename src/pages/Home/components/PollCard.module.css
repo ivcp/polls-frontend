@@ -26,3 +26,7 @@
 .seeMore:hover {
   opacity: 1;
 }
+
+.donut {
+  margin-inline: auto;
+}
