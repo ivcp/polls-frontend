@@ -1,14 +1,4 @@
-import {
-  Card,
-  Stack,
-  Text,
-  Radio,
-  RadioGroup,
-  Button,
-  Group,
-  Tooltip,
-  Skeleton,
-} from '@mantine/core';
+import { Card, Text, Skeleton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import pollService, { Poll } from '../../../services/polls';
 import classes from './PollCard.module.css';
@@ -16,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BarChart } from '@mantine/charts';
+import PollForm from './PollForm';
 
 const PollCard = ({ poll }: { poll: Poll }) => {
   const [selectedOption, setSelectedOption] = useState('');
@@ -77,50 +68,15 @@ const PollCard = ({ poll }: { poll: Poll }) => {
       </Card.Section>
       <Card.Section w={'100%'}>
         {!showResults ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (selectedOption === '') return;
-              mutation.mutate(selectedOption);
-            }}
-          >
-            <Stack gap={'1.5rem'}>
-              <RadioGroup
-                name={poll.question}
-                className={classes.radioGroup}
-                value={selectedOption}
-                onChange={setSelectedOption}
-              >
-                {poll.options.map((opt) => (
-                  <Radio key={opt.id} value={opt.id} label={opt.value} />
-                ))}
-              </RadioGroup>
-              <Group justify={'space-around'}>
-                {voteBtnDisabled ? (
-                  <Tooltip label="Poll has expired">
-                    <Button
-                      type="submit"
-                      data-disabled
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      Vote
-                    </Button>
-                  </Tooltip>
-                ) : (
-                  <Button type="submit">Vote</Button>
-                )}
-                <Button
-                  variant={'light'}
-                  onClick={() => {
-                    refetch();
-                    setShowResults(true);
-                  }}
-                >
-                  Results
-                </Button>
-              </Group>
-            </Stack>
-          </form>
+          <PollForm
+            poll={poll}
+            voteBtnDisabled={voteBtnDisabled}
+            refetch={refetch}
+            selectedOption={selectedOption}
+            mutation={mutation}
+            setSelectedOption={setSelectedOption}
+            setShowResults={setShowResults}
+          />
         ) : (
           <div>
             <p className={classes.close} onClick={() => setShowResults(false)}>

@@ -11,14 +11,6 @@
   color: inherit;
 }
 
-.radioGroup {
-  margin-inline: 1rem;
-}
-
-.radioGroup :not(:last-child) {
-  margin-bottom: 0.5rem;
-}
-
 .seeMore {
   opacity: 0.6;
 }

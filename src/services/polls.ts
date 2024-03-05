@@ -28,10 +28,10 @@ export interface PollResult {
   poll: Poll;
 }
 
-interface VoteResult {
+export interface VoteResult {
   message: string;
 }
-interface Results {
+export interface Results {
   results: {
     id: string;
     value: string;
