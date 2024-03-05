@@ -41,7 +41,7 @@ interface Results {
 }
 
 const listPolls = async (page: number): Promise<PollResults> => {
-  const response = await fetch(`/v1/polls${'?page=' + page}`);
+  const response = await fetch(`/v1/polls${'?page_size=12&page=' + page}`);
   if (!response.ok) {
     const err: { error: string } = await response.json();
     throw new Error(err.error);

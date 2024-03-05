@@ -21,7 +21,7 @@ export default function Polls() {
       <Grid>
         {isLoading && (
           <>
-            {[...Array(20)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <Grid.Col span={{ base: 12, md: 6, lg: 3 }} key={i}>
                 <Skeleton height={300} width={300} radius="sm" m={20} />
               </Grid.Col>
