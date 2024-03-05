@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../../services/polls';
 import PollCard from './components/PollCard';
-import { Button, Grid, Pagination } from '@mantine/core';
+import { Button, Grid, Pagination, Skeleton } from '@mantine/core';
 import classes from './index.module.css';
 
 export default function Polls() {
@@ -19,7 +19,15 @@ export default function Polls() {
         <Button size="lg">Create poll</Button>
       </div>
       <Grid>
-        {isLoading && <p>getting polls...</p>}
+        {isLoading && (
+          <>
+            {[...Array(20)].map((_, i) => (
+              <Grid.Col span={{ base: 12, md: 6, lg: 3 }} key={i}>
+                <Skeleton height={300} width={300} radius="sm" m={20} />
+              </Grid.Col>
+            ))}
+          </>
+        )}
         {isError && <p>Error: {error.message}</p>}
         {isSuccess && data.polls.length === 0 && (
           <p>There are currently no polls. Be the first to create one!</p>

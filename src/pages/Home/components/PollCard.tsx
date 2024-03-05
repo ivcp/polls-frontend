@@ -7,6 +7,7 @@ import {
   Button,
   Group,
   Tooltip,
+  Skeleton,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import pollService, { Poll } from '../../../services/polls';
@@ -37,6 +38,7 @@ const PollCard = ({ poll }: { poll: Poll }) => {
     isError: isResultsError,
     error: resultsError,
     isSuccess: isResultsSuccess,
+    isLoading: isResultsLoading,
     data: resultsData,
     refetch,
   } = useQuery({
@@ -125,6 +127,13 @@ const PollCard = ({ poll }: { poll: Poll }) => {
               &#8592;
             </p>
             {isResultsError && <p>{resultsError.message}</p>}
+            {isResultsLoading && (
+              <>
+                {poll.options.map((opt) => (
+                  <Skeleton key={opt.id} height={35} radius="xl" mb={'xs'} />
+                ))}
+              </>
+            )}
             {isResultsSuccess && (
               <BarChart
                 h={chartHeight}
