@@ -57,14 +57,16 @@ const CreatePoll = () => {
             withAsterisk={i > 1 ? false : true}
             {...form.getInputProps(`options.${i}.value`)}
           />
-          <ActionIcon
-            size={'1.8rem'}
-            mb={'0.2rem'}
-            color="red.6"
-            onClick={() => form.removeListItem('options', i)}
-          >
-            <IconTrash />
-          </ActionIcon>
+          {i > 1 && (
+            <ActionIcon
+              size={'1.8rem'}
+              mb={'0.2rem'}
+              color="red.6"
+              onClick={() => form.removeListItem('options', i)}
+            >
+              <IconTrash />
+            </ActionIcon>
+          )}
         </Group>
       ))}
       <Button onClick={() => form.insertListItem('options', { value: '' })}>
