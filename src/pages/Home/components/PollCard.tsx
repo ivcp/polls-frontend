@@ -1,30 +1,19 @@
 import { Card, Text, Skeleton, ActionIcon, Group } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import pollService, { Poll } from '../../../services/polls';
 import classes from './PollCard.module.css';
 import { Link } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BarChart } from '@mantine/charts';
 import PollForm from './PollForm';
 import { IconArrowNarrowLeft } from '@tabler/icons-react';
+import useVote from '../../../hooks/useVote';
 
 const PollCard = ({ poll }: { poll: Poll }) => {
   const [selectedOption, setSelectedOption] = useState('');
   const [showResults, setShowResults] = useState(false);
 
-  const mutation = useMutation({
-    mutationFn: (optionID: string) => pollService.vote(poll.id, optionID),
-    onError: (err) =>
-      notifications.show({
-        message: err.message.charAt(0).toUpperCase() + err.message.slice(1),
-        color: 'red',
-      }),
-    onSuccess: (data) =>
-      notifications.show({
-        message: data.message.charAt(0).toUpperCase() + data.message.slice(1),
-      }),
-  });
+  const vote = useVote(poll.id);
 
   const {
     isError: isResultsError,
@@ -75,7 +64,7 @@ const PollCard = ({ poll }: { poll: Poll }) => {
             voteBtnDisabled={voteBtnDisabled}
             refetch={refetch}
             selectedOption={selectedOption}
-            mutation={mutation}
+            vote={vote}
             setSelectedOption={setSelectedOption}
             setShowResults={setShowResults}
           />

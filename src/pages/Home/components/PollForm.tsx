@@ -1,5 +1,5 @@
 import {
-  UseMutationResult,
+  UseMutateFunction,
   RefetchOptions,
   QueryObserverResult,
 } from '@tanstack/react-query';
@@ -16,7 +16,7 @@ import classes from './PollForm.module.css';
 
 type PollFormProps = {
   selectedOption: string;
-  mutation: UseMutationResult<VoteResult, Error, string, unknown>;
+  vote: UseMutateFunction<VoteResult, Error, string, unknown>;
   voteBtnDisabled: boolean;
   poll: Poll;
   setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +28,7 @@ type PollFormProps = {
 
 const PollForm = ({
   selectedOption,
-  mutation,
+  vote,
   voteBtnDisabled,
   poll,
   setShowResults,
@@ -41,7 +41,7 @@ const PollForm = ({
       onSubmit={(e) => {
         e.preventDefault();
         if (selectedOption === '') return;
-        mutation.mutate(selectedOption);
+        vote(selectedOption);
       }}
     >
       <Stack gap={'1.5rem'}>
