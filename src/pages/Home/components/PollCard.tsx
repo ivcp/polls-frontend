@@ -1,4 +1,4 @@
-import { Card, Text, Skeleton } from '@mantine/core';
+import { Card, Text, Skeleton, ActionIcon, Group } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import pollService, { Poll } from '../../../services/polls';
 import classes from './PollCard.module.css';
@@ -7,6 +7,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BarChart } from '@mantine/charts';
 import PollForm from './PollForm';
+import { IconArrowNarrowLeft } from '@tabler/icons-react';
 
 const PollCard = ({ poll }: { poll: Poll }) => {
   const [selectedOption, setSelectedOption] = useState('');
@@ -80,9 +81,6 @@ const PollCard = ({ poll }: { poll: Poll }) => {
           />
         ) : (
           <div>
-            <p className={classes.close} onClick={() => setShowResults(false)}>
-              &#8592;
-            </p>
             {isResultsError && (
               <Text size="1.4rem" p={'lg'} ta={'center'}>
                 {resultsError.message}
@@ -118,11 +116,18 @@ const PollCard = ({ poll }: { poll: Poll }) => {
           </div>
         )}
       </Card.Section>
-      <Link to={`/${poll.id}`}>
-        <Text size="xs" className={classes.seeMore}>
-          see more details
-        </Text>
-      </Link>
+      <Group gap={'4rem'}>
+        {showResults && (
+          <ActionIcon variant="light" onClick={() => setShowResults(false)}>
+            <IconArrowNarrowLeft />
+          </ActionIcon>
+        )}
+        <Link to={`/${poll.id}`}>
+          <Text size="xs" className={classes.seeMore}>
+            see more details
+          </Text>
+        </Link>
+      </Group>
     </Card>
   );
 };
