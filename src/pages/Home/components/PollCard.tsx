@@ -1,33 +1,27 @@
 import { Card, Text, Skeleton, ActionIcon, Group } from '@mantine/core';
-import pollService, { Poll } from '../../../services/polls';
+import { Poll } from '../../../services/polls';
 import classes from './PollCard.module.css';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { BarChart } from '@mantine/charts';
 import PollForm from './PollForm';
 import { IconArrowNarrowLeft } from '@tabler/icons-react';
 import useVote from '../../../hooks/useVote';
+import useResults from '../../../hooks/useResults';
 
 const PollCard = ({ poll }: { poll: Poll }) => {
   const [selectedOption, setSelectedOption] = useState('');
   const [showResults, setShowResults] = useState(false);
 
   const vote = useVote(poll.id);
-
   const {
-    isError: isResultsError,
-    error: resultsError,
-    isSuccess: isResultsSuccess,
-    isLoading: isResultsLoading,
-    data: resultsData,
-    refetch,
-  } = useQuery({
-    queryKey: ['results', poll.id],
-    queryFn: pollService.getResults.bind(null, poll.id),
-    enabled: false,
-    retry: false,
-  });
+    isResultsError,
+    resultsError,
+    isResultsSuccess,
+    isResultsLoading,
+    resultsData,
+    refetchResults,
+  } = useResults(poll.id);
 
   const expiresSet = poll.expires_at !== '';
   let voteBtnDisabled = false;
@@ -41,7 +35,9 @@ const PollCard = ({ poll }: { poll: Poll }) => {
   let chartHeight = 80;
 
   if (isResultsSuccess) {
+    // @ts-expect-error: data is posssibly undefined with custom hook
     resultsData.results.length > 2 &&
+      // @ts-expect-error: data is posssibly undefined with custom hook
       (chartHeight = 40 * (resultsData.results.length - 2) + 80);
   }
   const tickFormatter = (value: string) => {
@@ -62,7 +58,7 @@ const PollCard = ({ poll }: { poll: Poll }) => {
           <PollForm
             poll={poll}
             voteBtnDisabled={voteBtnDisabled}
-            refetch={refetch}
+            refetchResults={refetchResults}
             selectedOption={selectedOption}
             vote={vote}
             setSelectedOption={setSelectedOption}
@@ -72,7 +68,10 @@ const PollCard = ({ poll }: { poll: Poll }) => {
           <div>
             {isResultsError && (
               <Text size="1.4rem" p={'lg'} ta={'center'}>
-                {resultsError.message}
+                {
+                  // @ts-expect-error: data is posssibly null with custom hook
+                  resultsError.message
+                }
               </Text>
             )}
             {isResultsLoading && (
@@ -88,9 +87,10 @@ const PollCard = ({ poll }: { poll: Poll }) => {
                 withXAxis={false}
                 tickLine="none"
                 gridAxis="none"
-                data={[...resultsData.results].sort(
-                  (a, b) => a.position - b.position
-                )}
+                data={[
+                  // @ts-expect-error: data is posssibly undefined with custom hook
+                  ...resultsData.results,
+                ].sort((a, b) => a.position - b.position)}
                 dataKey="value"
                 series={[{ name: 'vote_count', color: 'blue.6' }]}
                 orientation="vertical"

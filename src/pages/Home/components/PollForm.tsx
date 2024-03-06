@@ -21,7 +21,7 @@ type PollFormProps = {
   poll: Poll;
   setShowResults: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
-  refetch: (
+  refetchResults: (
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<Results, Error>>;
 };
@@ -33,7 +33,7 @@ const PollForm = ({
   poll,
   setShowResults,
   setSelectedOption,
-  refetch,
+  refetchResults,
 }: PollFormProps) => {
   const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
@@ -72,7 +72,7 @@ const PollForm = ({
           <Button
             variant={'light'}
             onClick={() => {
-              refetch();
+              refetchResults();
               setShowResults(true);
             }}
           >
