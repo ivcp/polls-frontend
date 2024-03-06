@@ -36,6 +36,7 @@ const PollCard = ({ poll }: { poll: Poll }) => {
     queryKey: ['results', poll.id],
     queryFn: pollService.getResults.bind(null, poll.id),
     enabled: false,
+    retry: false,
   });
 
   const expiresSet = poll.expires_at !== '';
@@ -82,7 +83,11 @@ const PollCard = ({ poll }: { poll: Poll }) => {
             <p className={classes.close} onClick={() => setShowResults(false)}>
               &#8592;
             </p>
-            {isResultsError && <p>{resultsError.message}</p>}
+            {isResultsError && (
+              <Text size="1.4rem" p={'lg'} ta={'center'}>
+                {resultsError.message}
+              </Text>
+            )}
             {isResultsLoading && (
               <>
                 {poll.options.map((opt) => (
