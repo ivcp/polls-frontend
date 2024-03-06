@@ -13,8 +13,28 @@ import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconTrash } from '@tabler/icons-react';
 import classes from './index.module.css';
+import pollService, { CreatePollBody } from '../../services/polls';
+import { useMutation } from '@tanstack/react-query';
+import { notifications } from '@mantine/notifications';
 
 const CreatePoll = () => {
+  const mutation = useMutation({
+    mutationFn: (poll: CreatePollBody) => pollService.createPoll(poll),
+    onError: (err) => {
+      const messages = err.message.split('|').slice(0, -1);
+      messages.forEach((message) => {
+        notifications.show({
+          message: message,
+          color: 'red',
+        });
+      });
+    },
+    onSuccess: () =>
+      notifications.show({
+        message: 'Poll created successfully!',
+      }),
+  });
+
   const form = useForm({
     initialValues: {
       question: '',
@@ -49,7 +69,22 @@ const CreatePoll = () => {
       <form
         className={classes.form}
         onSubmit={form.onSubmit((values) => {
-          console.log(values);
+          const poll: CreatePollBody = {
+            question: values.question,
+            description: values.description,
+            options: values.options.map((opt, i) => {
+              return { value: opt.value, position: i };
+            }),
+            is_private: values.isPrivate,
+            results_visibility: values.resultsVisibility,
+          };
+          if (values.expiresAt !== '') {
+            if (Date.parse(new Date(values.expiresAt).toString()) !== 0) {
+              poll.expires_at = new Date(values.expiresAt).toISOString();
+            }
+          }
+          console.log(poll);
+          mutation.mutate(poll);
         })}
       >
         <TextInput
