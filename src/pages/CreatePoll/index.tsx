@@ -16,8 +16,11 @@ import classes from './index.module.css';
 import pollService, { CreatePollBody } from '../../services/polls';
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePoll = () => {
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: (poll: CreatePollBody) => pollService.createPoll(poll),
     onError: (err) => {
@@ -29,10 +32,12 @@ const CreatePoll = () => {
         });
       });
     },
-    onSuccess: () =>
+    onSuccess: () => {
       notifications.show({
         message: 'Poll created successfully!',
-      }),
+      });
+      navigate('/');
+    },
   });
 
   const form = useForm({
@@ -83,7 +88,6 @@ const CreatePoll = () => {
               poll.expires_at = new Date(values.expiresAt).toISOString();
             }
           }
-          console.log(poll);
           mutation.mutate(poll);
         })}
       >
