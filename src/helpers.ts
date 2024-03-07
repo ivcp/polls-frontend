@@ -1,4 +1,4 @@
-import { Poll } from './services/polls';
+import { Poll } from './types';
 
 export const checkExpired = (poll: Poll): boolean => {
   const expiresSet = poll.expires_at !== '';

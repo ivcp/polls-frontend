@@ -3,7 +3,7 @@ import {
   RefetchOptions,
   QueryObserverResult,
 } from '@tanstack/react-query';
-import { Poll, Results, VoteResult } from '../services/polls';
+import { Poll, Results, VoteResult } from '../types';
 import {
   Stack,
   RadioGroup,

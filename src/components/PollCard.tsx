@@ -7,7 +7,7 @@ import {
   Title,
   Stack,
 } from '@mantine/core';
-import { Poll } from '../services/polls';
+import { Poll } from '../types';
 import classes from './PollCard.module.css';
 import { Link } from 'react-router-dom';
 import { BarChart } from '@mantine/charts';
