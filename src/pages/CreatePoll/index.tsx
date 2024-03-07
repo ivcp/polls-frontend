@@ -33,11 +33,11 @@ const CreatePoll = () => {
         });
       });
     },
-    onSuccess: () => {
+    onSuccess: ({ poll }) => {
       notifications.show({
         message: 'Poll created successfully!',
       });
-      navigate('/');
+      navigate(`/${poll.id}`);
     },
   });
 
