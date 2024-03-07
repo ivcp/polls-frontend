@@ -24,6 +24,7 @@ type PollFormProps = {
   refetchResults: (
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<Results, Error>>;
+  details: boolean;
 };
 
 const PollForm = ({
@@ -34,6 +35,7 @@ const PollForm = ({
   setShowResults,
   setSelectedOption,
   refetchResults,
+  details,
 }: PollFormProps) => {
   const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
@@ -50,12 +52,22 @@ const PollForm = ({
           className={classes.radioGroup}
           value={selectedOption}
           onChange={setSelectedOption}
+          mt={details ? 'md' : undefined}
+          mb={details ? 'md' : undefined}
         >
           {options.map((opt) => (
-            <Radio key={opt.id} value={opt.id} label={opt.value} />
+            <Radio
+              key={opt.id}
+              value={opt.id}
+              label={opt.value}
+              size={details ? 'md' : 'sm'}
+            />
           ))}
         </RadioGroup>
-        <Group justify={'space-around'}>
+        <Group
+          justify={details ? 'space-evenly' : 'space-around'}
+          mb={details ? 'xs' : undefined}
+        >
           {voteBtnDisabled ? (
             <Tooltip label="Poll has expired">
               <Button

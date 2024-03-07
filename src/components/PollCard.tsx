@@ -1,4 +1,12 @@
-import { Card, Text, Skeleton, ActionIcon, Group, Title } from '@mantine/core';
+import {
+  Card,
+  Text,
+  Skeleton,
+  ActionIcon,
+  Group,
+  Title,
+  Stack,
+} from '@mantine/core';
 import { Poll } from '../services/polls';
 import classes from './PollCard.module.css';
 import { Link } from 'react-router-dom';
@@ -42,7 +50,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
   return (
     <Card
       shadow="sm"
-      className={classes.container}
+      className={`${classes.container} ${details ? classes.noGap : ''}`}
       maw={details ? '45rem' : undefined}
       ml={details ? 'auto' : undefined}
       mr={details ? 'auto' : undefined}
@@ -55,6 +63,11 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             <Text fw={600}>{poll.question}</Text>
           )}
         </Link>
+        {details && (
+          <Text mt="sm" fs="italic">
+            {poll.description}
+          </Text>
+        )}
       </Card.Section>
       <Card.Section w={'100%'}>
         {!showResults ? (
@@ -66,6 +79,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             vote={vote}
             setSelectedOption={setSelectedOption}
             setShowResults={setShowResults}
+            details={details}
           />
         ) : (
           <div>
@@ -103,22 +117,46 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                 }}
                 withTooltip={false}
                 yAxisProps={{ tickFormatter, tickSize: 0 }}
+                pr={details ? '1rem' : undefined}
+                pl={details ? '1rem' : undefined}
               />
             )}
           </div>
         )}
       </Card.Section>
+
       <Group gap={'4rem'}>
         {showResults && (
           <ActionIcon variant="light" onClick={() => setShowResults(false)}>
             <IconArrowNarrowLeft />
           </ActionIcon>
         )}
-        <Link to={`/${poll.id}`}>
-          <Text size="xs" className={classes.seeMore}>
-            see more details
-          </Text>
-        </Link>
+        {details ? (
+          <Stack gap={'0.1rem'} mt="2rem">
+            <Text size="xs" c="dimmed">
+              <strong>Created:</strong>{' '}
+              {new Date(poll.created_at).toLocaleString()}
+            </Text>
+            <Text size="xs" c="dimmed">
+              <strong>Edited:</strong>{' '}
+              {new Date(poll.created_at) < new Date(poll.updated_at)
+                ? new Date(poll.updated_at).toLocaleString()
+                : 'No'}
+            </Text>
+            <Text size="xs" c="dimmed">
+              <strong>Expires:</strong>{' '}
+              {poll.expires_at === ''
+                ? 'No'
+                : new Date(poll.expires_at).toLocaleString()}
+            </Text>
+          </Stack>
+        ) : (
+          <Link to={`/${poll.id}`}>
+            <Text size="xs" className={classes.seeMore}>
+              see more details
+            </Text>
+          </Link>
+        )}
       </Group>
     </Card>
   );

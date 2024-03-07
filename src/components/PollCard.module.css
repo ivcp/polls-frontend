@@ -6,6 +6,12 @@
   padding: 2rem;
 }
 
+.noGap {
+  gap: 0;
+  margin-block: 1rem;
+  padding-block: 4rem;
+}
+
 .container a {
   text-decoration: none;
   color: inherit;
@@ -25,4 +31,8 @@
 
 :global(.recharts-surface) {
   overflow: visible;
+}
+
+.timeDetails {
+  align-self: flex-end;
 }
