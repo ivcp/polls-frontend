@@ -12,6 +12,7 @@ export interface Poll {
   expires_at: string;
   results_visibility: string;
   is_private: boolean;
+  token?: string;
 }
 
 export interface CreatePollBody
@@ -26,7 +27,7 @@ export interface CreatePollBody
   expires_at?: string;
 }
 
-export interface PollResults {
+export interface PollsResponse {
   metadata: {
     current_page: number;
     page_size: number;
@@ -37,14 +38,14 @@ export interface PollResults {
   polls: Poll[];
 }
 
-export interface PollResult {
+export interface PollResponse {
   poll: Poll;
 }
 
-export interface VoteResult {
+export interface VoteResponse {
   message: string;
 }
-export interface Results {
+export interface VoteResults {
   results: {
     id: string;
     value: string;

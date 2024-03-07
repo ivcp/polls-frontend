@@ -1,12 +1,13 @@
 import {
-  PollResults,
-  VoteResult,
-  PollResult,
-  Results,
+  PollsResponse,
+  VoteResponse,
+  PollResponse,
+  VoteResults,
   CreatePollBody,
+  Poll,
 } from '../types';
 
-const listPolls = async (page: number): Promise<PollResults> => {
+const listPolls = async (page: number): Promise<PollsResponse> => {
   const response = await fetch(`/v1/polls${'?page_size=12&page=' + page}`);
   if (!response.ok) {
     const err: { error: string } = await response.json();
@@ -15,7 +16,7 @@ const listPolls = async (page: number): Promise<PollResults> => {
   return await response.json();
 };
 
-const getPoll = async (pollID: string): Promise<PollResult> => {
+const getPoll = async (pollID: string): Promise<PollResponse> => {
   const response = await fetch(`/v1/polls/${pollID}`);
   if (!response.ok) {
     const err: { error: string } = await response.json();
@@ -24,7 +25,10 @@ const getPoll = async (pollID: string): Promise<PollResult> => {
   return await response.json();
 };
 
-const vote = async (pollID: string, optionID: string): Promise<VoteResult> => {
+const vote = async (
+  pollID: string,
+  optionID: string
+): Promise<VoteResponse> => {
   const response = await fetch(`/v1/polls/${pollID}/options/${optionID}`, {
     method: 'POST',
   });
@@ -35,7 +39,7 @@ const vote = async (pollID: string, optionID: string): Promise<VoteResult> => {
   return await response.json();
 };
 
-const getResults = async (pollID: string): Promise<Results> => {
+const getResults = async (pollID: string): Promise<VoteResults> => {
   const response = await fetch(`/v1/polls/${pollID}/results`);
   if (!response.ok) {
     const err: { error: string } = await response.json();
@@ -44,7 +48,7 @@ const getResults = async (pollID: string): Promise<Results> => {
   return await response.json();
 };
 
-const createPoll = async (poll: CreatePollBody): Promise<Results> => {
+const createPoll = async (poll: CreatePollBody): Promise<Poll> => {
   const response = await fetch('/v1/polls', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
