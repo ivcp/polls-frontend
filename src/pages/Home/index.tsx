@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../../services/polls';
-import PollCard from './components/PollCard';
+import PollCard from '../../components/PollCard';
 import { Button, Grid, Pagination, Skeleton } from '@mantine/core';
 import classes from './index.module.css';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,7 @@ export default function Polls() {
   });
 
   return (
-    <div className={classes.container}>
+    <div className={`${classes.container} ${isLoading && classes.center}`}>
       <div className={classes.titleContainer}>
         <p>Create a poll and share with others.</p>
         <Button component={Link} to={'/new'} size="lg">
@@ -38,7 +38,7 @@ export default function Polls() {
         {isSuccess &&
           data.polls.map((poll) => (
             <Grid.Col span={{ base: 12, md: 6, lg: 3 }} key={poll.id}>
-              <PollCard poll={poll} />
+              <PollCard poll={poll} details={false} />
             </Grid.Col>
           ))}
       </Grid>
