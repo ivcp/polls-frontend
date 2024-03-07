@@ -4,7 +4,6 @@ import {
   PollResponse,
   VoteResults,
   CreatePollBody,
-  Poll,
 } from '../types';
 
 const listPolls = async (page: number): Promise<PollsResponse> => {
@@ -48,7 +47,7 @@ const getResults = async (pollID: string): Promise<VoteResults> => {
   return await response.json();
 };
 
-const createPoll = async (poll: CreatePollBody): Promise<Poll> => {
+const createPoll = async (poll: CreatePollBody): Promise<PollResponse> => {
   const response = await fetch('/v1/polls', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
