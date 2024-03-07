@@ -1,3 +1,4 @@
+import { Title } from '@mantine/core';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
 function PollError() {
@@ -17,7 +18,9 @@ function PollError() {
 
   return (
     <div>
-      <h4>{errorMessage}</h4>
+      <Title order={4} mt={'2rem'} ta={'center'}>
+        Error loading poll: {errorMessage}
+      </Title>
     </div>
   );
 }

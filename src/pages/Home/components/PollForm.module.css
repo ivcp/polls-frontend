@@ -1,7 +1,0 @@
-.radioGroup {
-  margin-inline: 1rem;
-}
-
-.radioGroup :not(:last-child) {
-  margin-bottom: 0.5rem;
-}
