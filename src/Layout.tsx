@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
 import { AppShell, Burger, Group, Title, UnstyledButton } from '@mantine/core';
 
@@ -21,7 +21,9 @@ function Layout() {
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Group justify="space-between" style={{ flex: 1 }}>
-            <Title size={'sm'}>POLLS</Title>
+            <Link to={'/'} className={classes.linkTitle}>
+              <Title size={'sm'}>POLLS</Title>
+            </Link>
             <Group ml="xl" gap={0} visibleFrom="sm">
               <UnstyledButton className={classes.control}>New</UnstyledButton>
               <UnstyledButton className={classes.control}>
