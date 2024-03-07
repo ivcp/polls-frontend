@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../services/polls';
+import { useState } from 'react';
 
 const useResults = (pollID: string) => {
+  const [showResults, setShowResults] = useState(false);
+
   const {
     isError: isResultsError,
     error: resultsError,
@@ -17,6 +20,8 @@ const useResults = (pollID: string) => {
   });
 
   return {
+    showResults,
+    setShowResults,
     isResultsError,
     resultsError,
     isResultsSuccess,

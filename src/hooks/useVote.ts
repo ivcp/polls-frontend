@@ -1,10 +1,13 @@
 import pollService from '../services/polls';
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
+import { useState } from 'react';
 
 const useVote = (pollID: string) => {
+  const [selectedOption, setSelectedOption] = useState('');
+
   const { mutate: vote } = useMutation({
-    mutationFn: (optionID: string) => pollService.vote(pollID, optionID),
+    mutationFn: () => pollService.vote(pollID, selectedOption),
     onError: (err) =>
       notifications.show({
         message: err.message.charAt(0).toUpperCase() + err.message.slice(1),
@@ -16,7 +19,7 @@ const useVote = (pollID: string) => {
       }),
   });
 
-  return vote;
+  return { vote, selectedOption, setSelectedOption };
 };
 
 export default useVote;

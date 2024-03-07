@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.container a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.seeMore {
+  opacity: 0.6;
+}
+
+.seeMore:hover {
+  opacity: 1;
+}
+
+.donut {
+  margin-inline: auto;
+}
+
+:global(.recharts-surface) {
+  overflow: visible;
+}
