@@ -4,6 +4,7 @@ import {
   PollResponse,
   VoteResults,
   CreatePollBody,
+  EditPollBody,
 } from '../types';
 
 const listPolls = async (page: number): Promise<PollsResponse> => {
@@ -77,10 +78,48 @@ const createPoll = async (poll: CreatePollBody): Promise<PollResponse> => {
   return await response.json();
 };
 
+const editPoll = async (
+  pollID: string,
+  editPollBody: EditPollBody,
+  token: string
+): Promise<PollResponse> => {
+  const response = await fetch(`/v1/polls/${pollID}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(editPollBody),
+  });
+  if (!response.ok) {
+    if (response.status === 422) {
+      const err: {
+        error: {
+          expires_at?: string;
+          options?: string;
+          question?: string;
+          description?: string;
+          results_visibility?: string;
+        };
+      } = await response.json();
+      let errors = '';
+      for (const entry of Object.entries(err.error)) {
+        errors += `"${entry[0]}": ${entry[1]}|`;
+      }
+
+      throw new Error(errors);
+    }
+    const err: { error: string } = await response.json();
+    throw new Error(err.error);
+  }
+  return await response.json();
+};
+
 export default {
   listPolls,
   getPoll,
   vote,
   getResults,
   createPoll,
+  editPoll,
 };
