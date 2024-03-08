@@ -2,9 +2,8 @@ import {
   UseMutateFunction,
   RefetchOptions,
   QueryObserverResult,
-  useMutation,
 } from '@tanstack/react-query';
-import { Poll, VoteResults, VoteResponse, EditPollBody } from '../types';
+import { Poll, VoteResults, VoteResponse } from '../types';
 import {
   Stack,
   RadioGroup,
@@ -14,10 +13,6 @@ import {
   Button,
 } from '@mantine/core';
 import classes from './PollForm.module.css';
-import { notifications } from '@mantine/notifications';
-
-import pollService from '../services/polls';
-import { useNavigate } from 'react-router-dom';
 
 type PollFormProps = {
   selectedOption: string;
@@ -49,38 +44,7 @@ const PollForm = ({
   refetchResults,
   details,
   editMode,
-  editRefs,
-  pollToken,
 }: PollFormProps) => {
-  const navigate = useNavigate();
-
-  const { mutate: mutatePoll } = useMutation({
-    mutationFn: (editPollBody: EditPollBody) =>
-      pollService.editPoll(poll.id, editPollBody, pollToken),
-    onError: (err) => {
-      if (err.message.includes('|')) {
-        const messages = err.message.split('|').slice(0, -1);
-        messages.forEach((message) => {
-          notifications.show({
-            message: message,
-            color: 'red',
-          });
-        });
-        return;
-      }
-      notifications.show({
-        message: err.message,
-        color: 'red',
-      });
-    },
-    onSuccess: () => {
-      navigate(0);
-      notifications.show({
-        message: 'Poll edited',
-      });
-    },
-  });
-
   const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
     <form
@@ -136,25 +100,7 @@ const PollForm = ({
               Results
             </Button>
           </Group>
-        ) : (
-          <Button
-            onClick={() => {
-              const expTime = editRefs.expiresRef.current?.textContent;
-              const editPollBody: EditPollBody = {
-                question: editRefs.questionRef.current?.value,
-                description: editRefs.descriptionRef.current?.value,
-                expires_at: expTime
-                  ? expTime !== 'set expiry time'
-                    ? new Date(expTime).toISOString()
-                    : undefined
-                  : undefined,
-              };
-              mutatePoll(editPollBody);
-            }}
-          >
-            Submit changes
-          </Button>
-        )}
+        ) : null}
       </Stack>
     </form>
   );

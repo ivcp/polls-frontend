@@ -22,12 +22,21 @@ import Cookies from 'js-cookie';
 import { useState } from 'react';
 import useEdit from '../hooks/useEdit';
 import { DateTimePicker } from '@mantine/dates';
-import { IconPencil, IconX } from '@tabler/icons-react';
+import { IconPencil, IconX, IconDeviceFloppy } from '@tabler/icons-react';
+import { EditPollBody } from '../types';
+import { notifications } from '@mantine/notifications';
+import pollService from '../services/polls';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
-  const [editMode, setEditMode] = useState(false);
+  const getToken = Cookies.get(poll.id);
+  let pollToken = '';
+  if (getToken !== undefined) pollToken = getToken;
 
+  const [editMode, setEditMode] = useState(false);
   const editRefs = useEdit();
+  const navigate = useNavigate();
 
   const { vote, selectedOption, setSelectedOption } = useVote(poll.id);
 
@@ -41,6 +50,32 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
     resultsData,
     refetchResults,
   } = useResults(poll.id);
+
+  const { mutate: mutatePoll } = useMutation({
+    mutationFn: (editPollBody: EditPollBody) =>
+      pollService.editPoll(poll.id, editPollBody, pollToken),
+    onError: (err) => {
+      if (err.message.includes('|')) {
+        const messages = err.message.split('|').slice(0, -1);
+        messages.forEach((message) => {
+          notifications.show({
+            message: message,
+            color: 'red',
+          });
+        });
+        return;
+      }
+      notifications.show({
+        message: err.message,
+        color: 'red',
+      });
+    },
+    onSuccess: () => {
+      notifications.show({
+        message: 'Saved!',
+      });
+    },
+  });
 
   const voteBtnDisabled = checkExpired(poll);
 
@@ -58,9 +93,6 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
     return `${value.substring(0, limit)}...`;
   };
 
-  const pollToken = Cookies.get(poll.id);
-  details && console.log(pollToken);
-
   return (
     <Card
       shadow="sm"
@@ -70,27 +102,54 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       mr={details ? 'auto' : undefined}
       pt={details ? undefined : '3rem'}
     >
-      {pollToken !== undefined && details && (
-        <ActionIcon
-          pos="absolute"
-          top={'1rem'}
-          right={'1rem'}
-          variant="transparent"
-          onClick={() => setEditMode((prev) => !prev)}
-        >
-          {editMode ? <IconX /> : <IconPencil />}
-        </ActionIcon>
-      )}
+      {pollToken !== undefined &&
+        details &&
+        (editMode ? (
+          <ActionIcon
+            pos="absolute"
+            top={'1rem'}
+            right={'1rem'}
+            variant="transparent"
+            onClick={() => navigate(0)}
+          >
+            <IconX />
+          </ActionIcon>
+        ) : (
+          <ActionIcon
+            pos="absolute"
+            top={'1rem'}
+            right={'1rem'}
+            variant="transparent"
+            onClick={() => setEditMode(() => true)}
+          >
+            <IconPencil />
+          </ActionIcon>
+        ))}
       <Card.Section>
         <Link to={`/${poll.id}`}>
           {details ? (
             editMode ? (
-              <Group mb="sm">
+              <Group mb="sm" wrap="nowrap">
                 <Input.Description>Question</Input.Description>
                 <Textarea
+                  autosize
+                  rows={1}
                   defaultValue={poll.question}
                   ref={editRefs.questionRef}
                 />
+                <ActionIcon
+                  onClick={() => {
+                    const editPollBody: EditPollBody = {
+                      question: editRefs.questionRef.current?.value,
+                    };
+                    if (editPollBody.question === poll.question) {
+                      return;
+                    }
+                    mutatePoll(editPollBody);
+                  }}
+                >
+                  <IconDeviceFloppy />
+                </ActionIcon>
               </Group>
             ) : (
               <Title order={2}>{poll.question}</Title>
@@ -101,12 +160,27 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
         </Link>
         {details &&
           (editMode ? (
-            <Group mb="sm">
+            <Group mb="sm" wrap="nowrap">
               <Input.Description>Description</Input.Description>
               <Textarea
+                autosize
+                rows={1}
                 defaultValue={poll.description}
                 ref={editRefs.descriptionRef}
               />
+              <ActionIcon
+                onClick={() => {
+                  const editPollBody: EditPollBody = {
+                    description: editRefs.descriptionRef.current?.value,
+                  };
+                  if (editPollBody.description === poll.description) {
+                    return;
+                  }
+                  mutatePoll(editPollBody);
+                }}
+              >
+                <IconDeviceFloppy />
+              </ActionIcon>
             </Group>
           ) : (
             <Text mt="sm" fs="italic">
@@ -203,6 +277,24 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                   ref={editRefs.expiresRef}
                   clearable
                 />
+                <ActionIcon
+                  onClick={() => {
+                    const expTime = editRefs.expiresRef.current?.textContent;
+                    const editPollBody: EditPollBody = {
+                      expires_at: expTime
+                        ? expTime !== 'set expiry time'
+                          ? new Date(expTime).toISOString()
+                          : undefined
+                        : undefined,
+                    };
+                    if (editPollBody.expires_at === undefined) {
+                      return;
+                    }
+                    mutatePoll(editPollBody);
+                  }}
+                >
+                  <IconDeviceFloppy />
+                </ActionIcon>
               </Group>
             ) : (
               <Text size="xs" c="dimmed">
