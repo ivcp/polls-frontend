@@ -272,7 +272,11 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                 </Text>{' '}
                 <DateTimePicker
                   valueFormat="DD MMM YYYY hh:mm A"
-                  placeholder="set expiry time"
+                  placeholder={
+                    poll.expires_at !== ''
+                      ? 'change expiry time'
+                      : 'set expiry time'
+                  }
                   size="xs"
                   ref={editRefs.expiresRef}
                   clearable
