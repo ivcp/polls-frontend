@@ -18,6 +18,7 @@ import { CreatePollBody } from '../../types';
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
+import { setCookie } from '../../helpers';
 
 const CreatePoll = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const CreatePoll = () => {
       notifications.show({
         message: 'Poll created successfully!',
       });
+      setCookie(poll);
       navigate(`/${poll.id}`);
     },
   });
