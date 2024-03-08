@@ -26,6 +26,11 @@ export interface CreatePollBody
   }[];
   expires_at?: string;
 }
+export interface EditPollBody {
+  question?: string;
+  description?: string;
+  expires_at?: string;
+}
 
 export interface PollsResponse {
   metadata: {
