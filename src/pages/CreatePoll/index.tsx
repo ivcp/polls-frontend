@@ -26,12 +26,19 @@ const CreatePoll = () => {
   const mutation = useMutation({
     mutationFn: (poll: CreatePollBody) => pollService.createPoll(poll),
     onError: (err) => {
-      const messages = err.message.split('|').slice(0, -1);
-      messages.forEach((message) => {
-        notifications.show({
-          message: message,
-          color: 'red',
+      if (err.message.includes('|')) {
+        const messages = err.message.split('|').slice(0, -1);
+        messages.forEach((message) => {
+          notifications.show({
+            message: message,
+            color: 'red',
+          });
         });
+        return;
+      }
+      notifications.show({
+        message: err.message,
+        color: 'red',
       });
     },
     onSuccess: ({ poll }) => {
