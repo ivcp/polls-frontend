@@ -32,7 +32,9 @@ type PollFormProps = {
   details: boolean;
   editMode: boolean;
   editRefs: {
-    questionRef: React.RefObject<HTMLInputElement>;
+    questionRef: React.RefObject<HTMLTextAreaElement>;
+    descriptionRef: React.RefObject<HTMLTextAreaElement>;
+    expiresRef: React.RefObject<HTMLButtonElement>;
   };
   pollToken: string;
 };
@@ -56,21 +58,29 @@ const PollForm = ({
     mutationFn: (editPollBody: EditPollBody) =>
       pollService.editPoll(poll.id, editPollBody, pollToken),
     onError: (err) => {
-      const messages = err.message.split('|').slice(0, -1);
-      messages.forEach((message) => {
-        notifications.show({
-          message: message,
-          color: 'red',
+      if (err.message.includes('|')) {
+        const messages = err.message.split('|').slice(0, -1);
+        messages.forEach((message) => {
+          notifications.show({
+            message: message,
+            color: 'red',
+          });
         });
+        return;
+      }
+      notifications.show({
+        message: err.message,
+        color: 'red',
       });
     },
     onSuccess: () => {
       navigate(0);
       notifications.show({
-        message: 'Poll edited.',
+        message: 'Poll edited',
       });
     },
   });
+
   const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
     <form
@@ -129,8 +139,15 @@ const PollForm = ({
         ) : (
           <Button
             onClick={() => {
+              const expTime = editRefs.expiresRef.current?.textContent;
               const editPollBody: EditPollBody = {
                 question: editRefs.questionRef.current?.value,
+                description: editRefs.descriptionRef.current?.value,
+                expires_at: expTime
+                  ? expTime !== 'set expiry time'
+                    ? new Date(expTime).toISOString()
+                    : undefined
+                  : undefined,
               };
               mutatePoll(editPollBody);
             }}

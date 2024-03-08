@@ -6,8 +6,6 @@ import {
   Group,
   Title,
   Stack,
-  Button,
-  TextInput,
   Input,
   Textarea,
 } from '@mantine/core';
@@ -23,9 +21,11 @@ import { checkExpired } from '../helpers';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
 import useEdit from '../hooks/useEdit';
+import { DateTimePicker } from '@mantine/dates';
+import { IconPencil, IconX } from '@tabler/icons-react';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
-  const [toggleEdit, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   const editRefs = useEdit();
 
@@ -71,24 +71,23 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       pt={details ? undefined : '3rem'}
     >
       {pollToken !== undefined && details && (
-        <Button
+        <ActionIcon
           pos="absolute"
           top={'1rem'}
           right={'1rem'}
-          fw="bold"
           variant="transparent"
-          onClick={() => setEditMode(true)}
+          onClick={() => setEditMode((prev) => !prev)}
         >
-          edit
-        </Button>
+          {editMode ? <IconX /> : <IconPencil />}
+        </ActionIcon>
       )}
       <Card.Section>
         <Link to={`/${poll.id}`}>
           {details ? (
-            toggleEdit ? (
+            editMode ? (
               <Group mb="sm">
                 <Input.Description>Question</Input.Description>
-                <TextInput
+                <Textarea
                   defaultValue={poll.question}
                   ref={editRefs.questionRef}
                 />
@@ -101,10 +100,13 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           )}
         </Link>
         {details &&
-          (toggleEdit ? (
+          (editMode ? (
             <Group mb="sm">
               <Input.Description>Description</Input.Description>
-              <Textarea defaultValue={poll.description} />
+              <Textarea
+                defaultValue={poll.description}
+                ref={editRefs.descriptionRef}
+              />
             </Group>
           ) : (
             <Text mt="sm" fs="italic">
@@ -123,7 +125,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             setSelectedOption={setSelectedOption}
             setShowResults={setShowResults}
             details={details}
-            editMode={toggleEdit}
+            editMode={editMode}
             editRefs={editRefs}
             pollToken={pollToken ? pollToken : ''}
           />
@@ -189,12 +191,27 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                 ? new Date(poll.updated_at).toLocaleString()
                 : 'No'}
             </Text>
-            <Text size="xs" c="dimmed">
-              <strong>Expires:</strong>{' '}
-              {poll.expires_at === ''
-                ? 'No'
-                : new Date(poll.expires_at).toLocaleString()}
-            </Text>
+            {editMode ? (
+              <Group>
+                <Text size="xs" c="dimmed" fw="bold">
+                  Expires:
+                </Text>{' '}
+                <DateTimePicker
+                  valueFormat="DD MMM YYYY hh:mm A"
+                  placeholder="set expiry time"
+                  size="xs"
+                  ref={editRefs.expiresRef}
+                  clearable
+                />
+              </Group>
+            ) : (
+              <Text size="xs" c="dimmed">
+                <strong>Expires:</strong>{' '}
+                {poll.expires_at === ''
+                  ? 'No'
+                  : new Date(poll.expires_at).toLocaleString()}
+              </Text>
+            )}
           </Stack>
         ) : (
           <Link to={`/${poll.id}`}>
