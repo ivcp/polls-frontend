@@ -27,9 +27,9 @@ export interface CreatePollBody
   expires_at?: string;
 }
 export interface EditPollBody {
-  question: string | undefined;
-  description: string | undefined;
-  expires_at: string | undefined;
+  question?: string;
+  description?: string;
+  expires_at?: string;
 }
 
 export interface PollsResponse {
