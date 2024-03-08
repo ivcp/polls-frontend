@@ -8,7 +8,9 @@ function PollError() {
   if (isRouteErrorResponse(err)) {
     errorMessage = err.statusText;
   } else if (err instanceof Error) {
-    errorMessage = err.message;
+    err instanceof SyntaxError
+      ? (errorMessage = 'Something went wrong :(')
+      : (errorMessage = err.message);
   } else if (typeof err === 'string') {
     errorMessage = err;
   } else {
