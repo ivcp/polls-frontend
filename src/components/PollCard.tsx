@@ -6,6 +6,10 @@ import {
   Group,
   Title,
   Stack,
+  Button,
+  TextInput,
+  Input,
+  Textarea,
 } from '@mantine/core';
 import { Poll } from '../types';
 import classes from './PollCard.module.css';
@@ -16,8 +20,15 @@ import { IconArrowNarrowLeft } from '@tabler/icons-react';
 import useVote from '../hooks/useVote';
 import useResults from '../hooks/useResults';
 import { checkExpired } from '../helpers';
+import Cookies from 'js-cookie';
+import { useState } from 'react';
+import useEdit from '../hooks/useEdit';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
+  const [toggleEdit, setEditMode] = useState(false);
+
+  const editRefs = useEdit();
+
   const { vote, selectedOption, setSelectedOption } = useVote(poll.id);
 
   const {
@@ -47,6 +58,9 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
     return `${value.substring(0, limit)}...`;
   };
 
+  const pollToken = Cookies.get(poll.id);
+  details && console.log(pollToken);
+
   return (
     <Card
       shadow="sm"
@@ -54,20 +68,49 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       maw={details ? '45rem' : undefined}
       ml={details ? 'auto' : undefined}
       mr={details ? 'auto' : undefined}
+      pt={details ? undefined : '3rem'}
     >
+      {pollToken !== undefined && details && (
+        <Button
+          pos="absolute"
+          top={'1rem'}
+          right={'1rem'}
+          fw="bold"
+          variant="transparent"
+          onClick={() => setEditMode(true)}
+        >
+          edit
+        </Button>
+      )}
       <Card.Section>
         <Link to={`/${poll.id}`}>
           {details ? (
-            <Title order={2}>{poll.question}</Title>
+            toggleEdit ? (
+              <Group mb="sm">
+                <Input.Description>Question</Input.Description>
+                <TextInput
+                  defaultValue={poll.question}
+                  ref={editRefs.questionRef}
+                />
+              </Group>
+            ) : (
+              <Title order={2}>{poll.question}</Title>
+            )
           ) : (
             <Text fw={600}>{poll.question}</Text>
           )}
         </Link>
-        {details && (
-          <Text mt="sm" fs="italic">
-            {poll.description}
-          </Text>
-        )}
+        {details &&
+          (toggleEdit ? (
+            <Group mb="sm">
+              <Input.Description>Description</Input.Description>
+              <Textarea defaultValue={poll.description} />
+            </Group>
+          ) : (
+            <Text mt="sm" fs="italic">
+              {poll.description}
+            </Text>
+          ))}
       </Card.Section>
       <Card.Section w={'100%'}>
         {!showResults ? (
@@ -80,6 +123,9 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             setSelectedOption={setSelectedOption}
             setShowResults={setShowResults}
             details={details}
+            editMode={toggleEdit}
+            editRefs={editRefs}
+            pollToken={pollToken ? pollToken : ''}
           />
         ) : (
           <div>

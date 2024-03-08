@@ -2,8 +2,9 @@ import {
   UseMutateFunction,
   RefetchOptions,
   QueryObserverResult,
+  useMutation,
 } from '@tanstack/react-query';
-import { Poll, VoteResults, VoteResponse } from '../types';
+import { Poll, VoteResults, VoteResponse, EditPollBody } from '../types';
 import {
   Stack,
   RadioGroup,
@@ -13,6 +14,10 @@ import {
   Button,
 } from '@mantine/core';
 import classes from './PollForm.module.css';
+import { notifications } from '@mantine/notifications';
+
+import pollService from '../services/polls';
+import { useNavigate } from 'react-router-dom';
 
 type PollFormProps = {
   selectedOption: string;
@@ -25,6 +30,11 @@ type PollFormProps = {
     options?: RefetchOptions | undefined
   ) => Promise<QueryObserverResult<VoteResults, Error>>;
   details: boolean;
+  editMode: boolean;
+  editRefs: {
+    questionRef: React.RefObject<HTMLInputElement>;
+  };
+  pollToken: string;
 };
 
 const PollForm = ({
@@ -36,7 +46,31 @@ const PollForm = ({
   setSelectedOption,
   refetchResults,
   details,
+  editMode,
+  editRefs,
+  pollToken,
 }: PollFormProps) => {
+  const navigate = useNavigate();
+
+  const { mutate: mutatePoll } = useMutation({
+    mutationFn: (editPollBody: EditPollBody) =>
+      pollService.editPoll(poll.id, editPollBody, pollToken),
+    onError: (err) => {
+      const messages = err.message.split('|').slice(0, -1);
+      messages.forEach((message) => {
+        notifications.show({
+          message: message,
+          color: 'red',
+        });
+      });
+    },
+    onSuccess: () => {
+      navigate(0);
+      notifications.show({
+        message: 'Poll edited.',
+      });
+    },
+  });
   const options = [...poll.options].sort((a, b) => a.position - b.position);
   return (
     <form
@@ -64,33 +98,46 @@ const PollForm = ({
             />
           ))}
         </RadioGroup>
-        <Group
-          justify={details ? 'space-evenly' : 'space-around'}
-          mb={details ? 'xs' : undefined}
-        >
-          {voteBtnDisabled ? (
-            <Tooltip label="Poll has expired">
-              <Button
-                type="submit"
-                data-disabled
-                onClick={(e) => e.preventDefault()}
-              >
-                Vote
-              </Button>
-            </Tooltip>
-          ) : (
-            <Button type="submit">Vote</Button>
-          )}
+        {!editMode ? (
+          <Group
+            justify={details ? 'space-evenly' : 'space-around'}
+            mb={details ? 'xs' : undefined}
+          >
+            {voteBtnDisabled ? (
+              <Tooltip label="Poll has expired">
+                <Button
+                  type="submit"
+                  data-disabled
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Vote
+                </Button>
+              </Tooltip>
+            ) : (
+              <Button type="submit">Vote</Button>
+            )}
+            <Button
+              variant={'light'}
+              onClick={() => {
+                refetchResults();
+                setShowResults(true);
+              }}
+            >
+              Results
+            </Button>
+          </Group>
+        ) : (
           <Button
-            variant={'light'}
             onClick={() => {
-              refetchResults();
-              setShowResults(true);
+              const editPollBody: EditPollBody = {
+                question: editRefs.questionRef.current?.value,
+              };
+              mutatePoll(editPollBody);
             }}
           >
-            Results
+            Submit changes
           </Button>
-        </Group>
+        )}
       </Stack>
     </form>
   );
