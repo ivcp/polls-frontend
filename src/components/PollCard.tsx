@@ -30,9 +30,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
-  const getToken = Cookies.get(poll.id);
-  let pollToken = '';
-  if (getToken !== undefined) pollToken = getToken;
+  const pollToken = Cookies.get(poll.id);
 
   const [editMode, setEditMode] = useState(false);
   const editRefs = useEdit();
@@ -52,8 +50,13 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
   } = useResults(poll.id);
 
   const { mutate: mutatePoll } = useMutation({
-    mutationFn: (editPollBody: EditPollBody) =>
-      pollService.editPoll(poll.id, editPollBody, pollToken),
+    mutationFn: (editPollBody: EditPollBody) => {
+      let token = '';
+      if (pollToken !== undefined) {
+        token = pollToken;
+      }
+      return pollService.editPoll(poll.id, editPollBody, token);
+    },
     onError: (err) => {
       if (err.message.includes('|')) {
         const messages = err.message.split('|').slice(0, -1);
