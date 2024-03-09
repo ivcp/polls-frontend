@@ -9,7 +9,7 @@ import PollDetails from './pages/Poll';
 import pollService from './services/polls';
 import PollError from './pages/Poll/PollError';
 import CreatePoll from './pages/CreatePoll';
-import ErrorPage from './pages/ErrorPage';
+import NotFound from './pages/NotFoundPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,7 +26,7 @@ const router = createBrowserRouter(
         }}
       />
       <Route path="/new" element={<CreatePoll />} />
-      <Route path="*" element={<ErrorPage />} />
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );
