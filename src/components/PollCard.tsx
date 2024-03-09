@@ -105,7 +105,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       mr={details ? 'auto' : undefined}
       pt={details ? undefined : '3rem'}
     >
-      {pollToken !== undefined &&
+      {pollToken &&
         details &&
         (editMode ? (
           <ActionIcon
@@ -203,8 +203,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             setShowResults={setShowResults}
             details={details}
             editMode={editMode}
-            editRefs={editRefs}
-            pollToken={pollToken ? pollToken : ''}
+            pollToken={pollToken}
           />
         ) : (
           <div>
