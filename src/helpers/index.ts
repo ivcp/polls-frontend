@@ -43,8 +43,8 @@ export const mutationError = (err: Error) => {
   });
 };
 
-export const pollEditSuccess = () => {
+export const pollEditSuccess = (msg: string) => {
   notifications.show({
-    message: 'Saved!',
+    message: msg,
   });
 };

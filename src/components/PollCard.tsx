@@ -56,7 +56,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       return pollService.editPoll(poll.id, editPollBody, token);
     },
     onError: mutationError,
-    onSuccess: pollEditSuccess,
+    onSuccess: pollEditSuccess.bind(null, 'Saved!'),
   });
 
   const voteBtnDisabled = checkExpired(poll);

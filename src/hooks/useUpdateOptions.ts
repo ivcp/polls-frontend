@@ -13,7 +13,7 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
       return pollService.updateOptionValue(poll.id, v.optionID, v.body, token);
     },
     onError: mutationError,
-    onSuccess: pollEditSuccess,
+    onSuccess: pollEditSuccess.bind(null, 'Saved!'),
   });
 
   const { mutate: mutateOptionPositions } = useMutation({
@@ -25,7 +25,7 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
       return pollService.updateOptionsPositions(poll.id, body, token);
     },
     onError: mutationError,
-    onSuccess: pollEditSuccess,
+    onSuccess: pollEditSuccess.bind(null, 'Positions saved!'),
   });
 
   return {
