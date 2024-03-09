@@ -5,6 +5,7 @@ import {
   VoteResults,
   CreatePollBody,
   EditPollBody,
+  UpdateOptionBody,
 } from '../types';
 
 const fetchData = async (url: string, config: RequestInit | undefined) => {
@@ -63,7 +64,7 @@ const createPoll = async (poll: CreatePollBody): Promise<PollResponse> => {
 
 const editPoll = async (
   pollID: string,
-  editPollBody: EditPollBody,
+  body: EditPollBody,
   token: string
 ): Promise<PollResponse> => {
   return await fetchData(`/v1/polls/${pollID}`, {
@@ -72,7 +73,23 @@ const editPoll = async (
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(editPollBody),
+    body: JSON.stringify(body),
+  });
+};
+
+const updateOptionValue = async (
+  pollID: string,
+  optionId: string,
+  body: UpdateOptionBody,
+  token: string
+) => {
+  return await fetchData(`/v1/polls/${pollID}/options/${optionId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
   });
 };
 
@@ -83,4 +100,5 @@ export default {
   getResults,
   createPoll,
   editPoll,
+  updateOptionValue,
 };
