@@ -31,7 +31,14 @@ export default function Polls() {
             ))}
           </>
         )}
-        {isError && <p>Error: {error.message}</p>}
+        {isError && (
+          <p>
+            Error:{' '}
+            {error instanceof SyntaxError
+              ? 'Something went wrong :('
+              : error.message}
+          </p>
+        )}
         {isSuccess && data.polls.length === 0 && (
           <p>There are currently no polls. Be the first to create one!</p>
         )}
