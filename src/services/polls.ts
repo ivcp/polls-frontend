@@ -6,6 +6,7 @@ import {
   CreatePollBody,
   EditPollBody,
   UpdateOptionBody,
+  UpdateOptionsPositionsBody,
 } from '../types';
 
 const fetchData = async (url: string, config: RequestInit | undefined) => {
@@ -93,6 +94,21 @@ const updateOptionValue = async (
   });
 };
 
+const updateOptionsPositions = async (
+  pollID: string,
+  body: UpdateOptionsPositionsBody,
+  token: string
+) => {
+  return await fetchData(`/v1/polls/${pollID}/options`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+};
+
 export default {
   listPolls,
   getPoll,
@@ -101,4 +117,5 @@ export default {
   createPoll,
   editPoll,
   updateOptionValue,
+  updateOptionsPositions,
 };
