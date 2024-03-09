@@ -4,7 +4,13 @@ import {
   QueryObserverResult,
   useMutation,
 } from '@tanstack/react-query';
-import { Poll, VoteResults, VoteResponse, UpdateOptionBody } from '../types';
+import {
+  Poll,
+  VoteResults,
+  VoteResponse,
+  UpdateOptionBody,
+  UpdateOptionsPositionsBody,
+} from '../types';
 import {
   Stack,
   RadioGroup,
@@ -20,7 +26,8 @@ import classes from './PollForm.module.css';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import pollService from '../services/polls';
 import { notifications } from '@mantine/notifications';
-import { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { useListState } from '@mantine/hooks';
 
 type PollFormProps = {
   selectedOption: string;
@@ -49,28 +56,9 @@ const PollForm = ({
   editMode,
   pollToken,
 }: PollFormProps) => {
-  const [editOptions, setEditOptions] = useState<
-    Map<
-      string,
-      {
-        value: string;
-        position: number;
-      }
-    >
-  >(() => {
-    return new Map<
-      string,
-      {
-        value: string;
-        position: number;
-      }
-    >(
-      Array.from(poll.options, (o) => [
-        o.id,
-        { value: o.value, position: o.position },
-      ])
-    );
-  });
+  const options = [...poll.options].sort((a, b) => a.position - b.position);
+
+  const [optionsList, handlers] = useListState(options);
 
   const { mutate: mutateOptionValue } = useMutation({
     mutationFn: (v: { optionID: string; body: UpdateOptionBody }) => {
@@ -103,7 +91,39 @@ const PollForm = ({
     },
   });
 
-  const options = [...poll.options].sort((a, b) => a.position - b.position);
+  const { mutate: mutateOptionPositions } = useMutation({
+    mutationFn: (body: UpdateOptionsPositionsBody) => {
+      let token = '';
+      if (pollToken !== undefined) {
+        token = pollToken;
+      }
+      return pollService.updateOptionsPositions(poll.id, body, token);
+    },
+    onError: (err) => {
+      if (err.message.includes('|')) {
+        const messages = err.message.split('|').slice(0, -1);
+        messages.forEach((message) => {
+          notifications.show({
+            message: message,
+            color: 'red',
+          });
+        });
+        return;
+      }
+      notifications.show({
+        message: err.message,
+        color: 'red',
+      });
+    },
+    onSuccess: () => {
+      notifications.show({
+        message: 'Saved!',
+      });
+    },
+  });
+
+  console.log('rerender');
+
   return (
     <form
       onSubmit={(e) => {
@@ -121,45 +141,95 @@ const PollForm = ({
           mt={details ? 'md' : undefined}
           mb={details ? 'md' : undefined}
         >
-          {options.map((opt) =>
-            editMode ? (
-              <Group key={opt.id}>
-                <InputLabel>{opt.position + 1}</InputLabel>
-                <Textarea
-                  rows={1}
-                  autosize
-                  value={editOptions.get(opt.id)?.value}
-                  onChange={(e) => {
-                    setEditOptions((prev) =>
-                      new Map(prev).set(opt.id, {
-                        value: e.target.value,
-                        position: opt.position,
-                      })
-                    );
-                  }}
-                />
-                <ActionIcon
-                  onClick={() => {
-                    const body: UpdateOptionBody = {
-                      value: editOptions.get(opt.id)?.value,
-                    };
-                    const oldOpt = poll.options.find((o) => o.id === opt.id);
-                    if (body.value === oldOpt?.value) return;
-                    mutateOptionValue({ optionID: opt.id, body: body });
-                  }}
-                >
-                  <IconDeviceFloppy />
-                </ActionIcon>
-              </Group>
-            ) : (
-              <Radio
-                key={opt.id}
-                value={opt.id}
-                label={opt.value}
-                size={details ? 'md' : 'sm'}
-              />
-            )
-          )}
+          <DragDropContext
+            onDragEnd={({ source, destination }) => {
+              if (
+                destination?.index !== undefined &&
+                destination?.index !== source.index
+              ) {
+                const dragged = optionsList.find(
+                  (o) => o.position === source.index
+                );
+                const draggedOver = optionsList.find(
+                  (o) => o.position === destination.index
+                );
+
+                if (dragged === undefined || draggedOver === undefined) return;
+
+                const body: UpdateOptionsPositionsBody = {
+                  options: [
+                    { id: dragged.id, position: destination.index },
+                    { id: draggedOver.id, position: source.index },
+                  ],
+                };
+                mutateOptionPositions(body);
+                handlers.reorder({ from: source.index, to: destination.index });
+              }
+            }}
+          >
+            <Droppable droppableId="dnd-list" direction="vertical">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {optionsList.map((opt, index) =>
+                    editMode ? (
+                      <Draggable
+                        key={opt.id}
+                        index={index}
+                        draggableId={opt.id}
+                      >
+                        {(provided) => (
+                          <Group
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                          >
+                            <InputLabel>{opt.position + 1}</InputLabel>
+                            <Textarea
+                              rows={1}
+                              autosize
+                              value={opt.value}
+                              onChange={(e) => {
+                                handlers.setItemProp(
+                                  opt.position,
+                                  'value',
+                                  e.target.value
+                                );
+                              }}
+                            />
+                            <ActionIcon
+                              onClick={() => {
+                                const body: UpdateOptionBody = {
+                                  value: opt.value,
+                                };
+                                const oldOpt = poll.options.find(
+                                  (o) => o.id === opt.id
+                                );
+                                if (body.value === oldOpt?.value) return;
+                                mutateOptionValue({
+                                  optionID: opt.id,
+                                  body: body,
+                                });
+                              }}
+                            >
+                              <IconDeviceFloppy />
+                            </ActionIcon>
+                          </Group>
+                        )}
+                      </Draggable>
+                    ) : (
+                      <Radio
+                        key={opt.id}
+                        value={opt.id}
+                        label={opt.value}
+                        size={details ? 'md' : 'sm'}
+                      />
+                    )
+                  )}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </RadioGroup>
         {!editMode ? (
           <Group
