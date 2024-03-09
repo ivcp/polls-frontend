@@ -62,3 +62,10 @@ export interface VoteResults {
 export interface UpdateOptionBody {
   value?: string;
 }
+
+export interface UpdateOptionsPositionsBody {
+  options: {
+    id: string;
+    position: number;
+  }[];
+}
