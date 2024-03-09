@@ -18,11 +18,10 @@ import {
   Tooltip,
   Button,
   Textarea,
-  InputLabel,
   ActionIcon,
 } from '@mantine/core';
 import classes from './PollForm.module.css';
-import { IconDeviceFloppy } from '@tabler/icons-react';
+import { IconDeviceFloppy, IconGripVertical } from '@tabler/icons-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useListState } from '@mantine/hooks';
 import useUpdateOptions from '../hooks/useUpdateOptions';
@@ -54,9 +53,9 @@ const PollForm = ({
   editMode,
   pollToken,
 }: PollFormProps) => {
-  const options = [...poll.options].sort((a, b) => a.position - b.position);
-
-  const [optionsList, handlers] = useListState(options);
+  const [optionsList, handlers] = useListState(
+    [...poll.options].sort((a, b) => a.position - b.position)
+  );
 
   const { mutateOptionValue, mutateOptionPositions } = useUpdateOptions(
     pollToken,
@@ -102,6 +101,16 @@ const PollForm = ({
                   ],
                 };
                 mutateOptionPositions(body);
+                handlers.setItemProp(
+                  dragged.position,
+                  'position',
+                  destination.index
+                );
+                handlers.setItemProp(
+                  draggedOver.position,
+                  'position',
+                  source.index
+                );
                 handlers.reorder({ from: source.index, to: destination.index });
               }
             }}
@@ -121,8 +130,9 @@ const PollForm = ({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             ref={provided.innerRef}
+                            wrap="nowrap"
                           >
-                            <InputLabel>{opt.position + 1}</InputLabel>
+                            <IconGripVertical className={classes.grip} />
                             <Textarea
                               rows={1}
                               autosize
