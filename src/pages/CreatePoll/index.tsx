@@ -18,29 +18,14 @@ import { CreatePollBody } from '../../types';
 import { useMutation } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
-import { setCookie } from '../../helpers';
+import { mutationError, setCookie } from '../../helpers';
 
 const CreatePoll = () => {
   const navigate = useNavigate();
 
-  const mutation = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (poll: CreatePollBody) => pollService.createPoll(poll),
-    onError: (err) => {
-      if (err.message.includes('|')) {
-        const messages = err.message.split('|').slice(0, -1);
-        messages.forEach((message) => {
-          notifications.show({
-            message: message,
-            color: 'red',
-          });
-        });
-        return;
-      }
-      notifications.show({
-        message: err.message,
-        color: 'red',
-      });
-    },
+    onError: mutationError,
     onSuccess: ({ poll }) => {
       notifications.show({
         message: 'Poll created successfully!',
@@ -98,7 +83,7 @@ const CreatePoll = () => {
               poll.expires_at = new Date(values.expiresAt).toISOString();
             }
           }
-          mutation.mutate(poll);
+          mutate(poll);
         })}
       >
         <TextInput

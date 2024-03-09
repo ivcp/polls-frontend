@@ -2,7 +2,6 @@ import {
   UseMutateFunction,
   RefetchOptions,
   QueryObserverResult,
-  useMutation,
 } from '@tanstack/react-query';
 import {
   Poll,
@@ -24,10 +23,9 @@ import {
 } from '@mantine/core';
 import classes from './PollForm.module.css';
 import { IconDeviceFloppy } from '@tabler/icons-react';
-import pollService from '../services/polls';
-import { notifications } from '@mantine/notifications';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useListState } from '@mantine/hooks';
+import useUpdateOptions from '../hooks/useUpdateOptions';
 
 type PollFormProps = {
   selectedOption: string;
@@ -60,69 +58,10 @@ const PollForm = ({
 
   const [optionsList, handlers] = useListState(options);
 
-  const { mutate: mutateOptionValue } = useMutation({
-    mutationFn: (v: { optionID: string; body: UpdateOptionBody }) => {
-      let token = '';
-      if (pollToken !== undefined) {
-        token = pollToken;
-      }
-      return pollService.updateOptionValue(poll.id, v.optionID, v.body, token);
-    },
-    onError: (err) => {
-      if (err.message.includes('|')) {
-        const messages = err.message.split('|').slice(0, -1);
-        messages.forEach((message) => {
-          notifications.show({
-            message: message,
-            color: 'red',
-          });
-        });
-        return;
-      }
-      notifications.show({
-        message: err.message,
-        color: 'red',
-      });
-    },
-    onSuccess: () => {
-      notifications.show({
-        message: 'Saved!',
-      });
-    },
-  });
-
-  const { mutate: mutateOptionPositions } = useMutation({
-    mutationFn: (body: UpdateOptionsPositionsBody) => {
-      let token = '';
-      if (pollToken !== undefined) {
-        token = pollToken;
-      }
-      return pollService.updateOptionsPositions(poll.id, body, token);
-    },
-    onError: (err) => {
-      if (err.message.includes('|')) {
-        const messages = err.message.split('|').slice(0, -1);
-        messages.forEach((message) => {
-          notifications.show({
-            message: message,
-            color: 'red',
-          });
-        });
-        return;
-      }
-      notifications.show({
-        message: err.message,
-        color: 'red',
-      });
-    },
-    onSuccess: () => {
-      notifications.show({
-        message: 'Saved!',
-      });
-    },
-  });
-
-  console.log('rerender');
+  const { mutateOptionValue, mutateOptionPositions } = useUpdateOptions(
+    pollToken,
+    poll
+  );
 
   return (
     <form

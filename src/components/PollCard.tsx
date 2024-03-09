@@ -17,21 +17,19 @@ import PollForm from './PollForm';
 import { IconArrowNarrowLeft } from '@tabler/icons-react';
 import useVote from '../hooks/useVote';
 import useResults from '../hooks/useResults';
-import { checkExpired } from '../helpers';
+import { checkExpired, mutationError, pollEditSuccess } from '../helpers';
 import Cookies from 'js-cookie';
 import { useState } from 'react';
 import useEdit from '../hooks/useEdit';
 import { DateTimePicker } from '@mantine/dates';
 import { IconPencil, IconX, IconDeviceFloppy } from '@tabler/icons-react';
 import { EditPollBody } from '../types';
-import { notifications } from '@mantine/notifications';
 import pollService from '../services/polls';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
   const pollToken = Cookies.get(poll.id);
-
   const [editMode, setEditMode] = useState(false);
   const editRefs = useEdit();
   const navigate = useNavigate();
@@ -57,27 +55,8 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       }
       return pollService.editPoll(poll.id, editPollBody, token);
     },
-    onError: (err) => {
-      if (err.message.includes('|')) {
-        const messages = err.message.split('|').slice(0, -1);
-        messages.forEach((message) => {
-          notifications.show({
-            message: message,
-            color: 'red',
-          });
-        });
-        return;
-      }
-      notifications.show({
-        message: err.message,
-        color: 'red',
-      });
-    },
-    onSuccess: () => {
-      notifications.show({
-        message: 'Saved!',
-      });
-    },
+    onError: mutationError,
+    onSuccess: pollEditSuccess,
   });
 
   const voteBtnDisabled = checkExpired(poll);

@@ -1,3 +1,4 @@
+import { notifications } from '@mantine/notifications';
 import { Poll } from '../types';
 import Cookies from 'js-cookie';
 
@@ -23,4 +24,27 @@ export const setCookie = (poll: Poll) => {
           expires: new Date(poll.expires_at),
         });
   }
+};
+
+export const mutationError = (err: Error) => {
+  if (err.message.includes('|')) {
+    const messages = err.message.split('|').slice(0, -1);
+    messages.forEach((message) => {
+      notifications.show({
+        message: message,
+        color: 'red',
+      });
+    });
+    return;
+  }
+  notifications.show({
+    message: err.message,
+    color: 'red',
+  });
+};
+
+export const pollEditSuccess = () => {
+  notifications.show({
+    message: 'Saved!',
+  });
 };
