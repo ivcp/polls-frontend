@@ -58,3 +58,7 @@ export interface VoteResults {
     vote_count: number;
   }[];
 }
+
+export interface UpdateOptionBody {
+  value?: string;
+}
