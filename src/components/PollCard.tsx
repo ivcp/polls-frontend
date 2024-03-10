@@ -126,38 +126,40 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           </ActionIcon>
         ))}
       <Card.Section>
-        <Link to={`/${poll.id}`}>
-          {details ? (
-            editMode ? (
-              <Group mb="sm" wrap="nowrap">
-                <Input.Description>Question</Input.Description>
-                <Textarea
-                  autosize
-                  rows={1}
-                  defaultValue={poll.question}
-                  ref={editRefs.questionRef}
-                />
-                <ActionIcon
-                  onClick={() => {
-                    const editPollBody: EditPollBody = {
-                      question: editRefs.questionRef.current?.value,
-                    };
-                    if (editPollBody.question === poll.question) {
-                      return;
-                    }
-                    updatePoll(editPollBody);
-                  }}
-                >
-                  <IconDeviceFloppy />
-                </ActionIcon>
-              </Group>
-            ) : (
-              <Title order={2}>{poll.question}</Title>
-            )
+        {details ? (
+          editMode ? (
+            <Group mb="sm" wrap="nowrap">
+              <Input.Description>Question</Input.Description>
+              <Textarea
+                autosize
+                rows={1}
+                defaultValue={poll.question}
+                ref={editRefs.questionRef}
+              />
+              <ActionIcon
+                onClick={() => {
+                  const editPollBody: EditPollBody = {
+                    question: editRefs.questionRef.current?.value,
+                  };
+                  if (editPollBody.question === poll.question) {
+                    return;
+                  }
+                  updatePoll(editPollBody);
+                }}
+              >
+                <IconDeviceFloppy />
+              </ActionIcon>
+            </Group>
           ) : (
+            <Title order={2} ta="center">
+              {poll.question}
+            </Title>
+          )
+        ) : (
+          <Link to={`/${poll.id}`}>
             <Text fw={600}>{poll.question}</Text>
-          )}
-        </Link>
+          </Link>
+        )}
         {details &&
           (editMode ? (
             <Group mb="sm" wrap="nowrap">
@@ -221,6 +223,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             )}
             {isResultsSuccess && (
               <BarChart
+                mt="xs"
                 h={chartHeight}
                 withXAxis={false}
                 tickLine="none"
