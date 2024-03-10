@@ -8,6 +8,8 @@ import {
   Stack,
   Input,
   Textarea,
+  Button,
+  Modal,
 } from '@mantine/core';
 import { Poll } from '../types';
 import classes from './PollCard.module.css';
@@ -27,12 +29,16 @@ import { EditPollBody } from '../types';
 import pollService from '../services/polls';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useDisclosure } from '@mantine/hooks';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
   const pollToken = Cookies.get(poll.id);
   const [editMode, setEditMode] = useState(false);
   const editRefs = useEdit();
   const navigate = useNavigate();
+
+  const [isModalOpen, { open: openModal, close: closeModal }] =
+    useDisclosure(false);
 
   const { vote, selectedOption, setSelectedOption } = useVote(poll.id);
 
@@ -47,7 +53,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
     refetchResults,
   } = useResults(poll.id);
 
-  const { mutate: mutatePoll } = useMutation({
+  const { mutate: updatePoll } = useMutation({
     mutationFn: (editPollBody: EditPollBody) => {
       let token = '';
       if (pollToken !== undefined) {
@@ -57,6 +63,18 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
     },
     onError: mutationError,
     onSuccess: pollEditSuccess.bind(null, 'Saved!'),
+  });
+
+  const { mutate: deletePoll } = useMutation({
+    mutationFn: () => {
+      let token = '';
+      if (pollToken !== undefined) {
+        token = pollToken;
+      }
+      return pollService.deletePoll(poll.id, token);
+    },
+    onError: mutationError,
+    onSuccess: () => navigate('/'),
   });
 
   const voteBtnDisabled = checkExpired(poll);
@@ -127,7 +145,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                     if (editPollBody.question === poll.question) {
                       return;
                     }
-                    mutatePoll(editPollBody);
+                    updatePoll(editPollBody);
                   }}
                 >
                   <IconDeviceFloppy />
@@ -158,7 +176,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                   if (editPollBody.description === poll.description) {
                     return;
                   }
-                  mutatePoll(editPollBody);
+                  updatePoll(editPollBody);
                 }}
               >
                 <IconDeviceFloppy />
@@ -275,7 +293,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                     if (editPollBody.expires_at === undefined) {
                       return;
                     }
-                    mutatePoll(editPollBody);
+                    updatePoll(editPollBody);
                   }}
                 >
                   <IconDeviceFloppy />
@@ -298,6 +316,37 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           </Link>
         )}
       </Group>
+      {editMode && (
+        <Button
+          mt={'2rem'}
+          color="red.6"
+          size="compact-md"
+          onClick={() => {
+            openModal();
+          }}
+        >
+          Delete poll
+        </Button>
+      )}
+      <Modal opened={isModalOpen} onClose={closeModal}>
+        <Stack align="center">
+          <Text>Are you sure you want to delete this poll?</Text>
+          <Group>
+            <Button
+              onClick={() =>
+                deletePoll(undefined, {
+                  onSuccess: () => pollEditSuccess('Poll deleted!'),
+                })
+              }
+            >
+              Yes
+            </Button>
+            <Button variant="light" onClick={closeModal}>
+              Cancel
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Card>
   );
 };

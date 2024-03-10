@@ -135,6 +135,15 @@ const deleteOption = async (
   });
 };
 
+const deletePoll = async (pollID: string, token: string) => {
+  return await fetchData(`/v1/polls/${pollID}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default {
   listPolls,
   getPoll,
@@ -146,4 +155,5 @@ export default {
   updateOptionsPositions,
   addOption,
   deleteOption,
+  deletePoll,
 };
