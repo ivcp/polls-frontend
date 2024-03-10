@@ -25,6 +25,9 @@ import { IconDeviceFloppy, IconGripVertical } from '@tabler/icons-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useListState } from '@mantine/hooks';
 import useUpdateOptions from '../hooks/useUpdateOptions';
+import { useDisclosure } from '@mantine/hooks';
+import { useRef, useState } from 'react';
+import { useRevalidator } from 'react-router-dom';
 
 type PollFormProps = {
   selectedOption: string;
@@ -53,14 +56,71 @@ const PollForm = ({
   editMode,
   pollToken,
 }: PollFormProps) => {
-  const [optionsList, handlers] = useListState(
+  const [optionsList, optionListHandlers] = useListState(
     [...poll.options].sort((a, b) => a.position - b.position)
   );
+  const [addOptionOpen, { toggle: toggleAddOption }] = useDisclosure(false);
 
-  const { mutateOptionValue, mutateOptionPositions } = useUpdateOptions(
-    pollToken,
-    poll
-  );
+  const { mutateOptionValue, mutateOptionPositions, mutateAddOption } =
+    useUpdateOptions(pollToken, poll);
+
+  const addOptionRef = useRef<HTMLTextAreaElement>(null);
+
+  const revalidator = useRevalidator();
+
+  const [isPositionChange, setIsPositionChange] = useState(false);
+
+  if (optionsList.length !== poll.options.length) {
+    const newOption = poll.options.find(
+      (o) => o.position === optionsList.length
+    );
+    newOption &&
+      optionListHandlers.append({
+        id: newOption.id,
+        value: newOption.value,
+        position: newOption.position,
+      });
+  }
+
+  if (isPositionChange) {
+    const changedPosition = optionsList.reduce(
+      (acc, cur, i) => {
+        if (cur.position !== i) {
+          acc.push({ ...cur, position: i });
+          return acc;
+        }
+        return acc;
+      },
+      [] as {
+        id: string;
+        value: string;
+        position: number;
+      }[]
+    );
+    const body: UpdateOptionsPositionsBody = {
+      options: changedPosition.map((opt) => ({
+        id: opt.id,
+        position: opt.position,
+      })),
+    };
+    mutateOptionPositions(body, {
+      onSuccess: () => {
+        optionListHandlers.applyWhere(
+          (opt, i) => opt.position !== i,
+          (opt, i) => {
+            if (i === undefined) return { ...opt };
+            return {
+              id: opt.id,
+              value: opt.value,
+              position: i,
+            };
+          }
+        );
+      },
+    });
+
+    setIsPositionChange(false);
+  }
 
   return (
     <form
@@ -85,33 +145,11 @@ const PollForm = ({
                 destination?.index !== undefined &&
                 destination?.index !== source.index
               ) {
-                const dragged = optionsList.find(
-                  (o) => o.position === source.index
-                );
-                const draggedOver = optionsList.find(
-                  (o) => o.position === destination.index
-                );
-
-                if (dragged === undefined || draggedOver === undefined) return;
-
-                const body: UpdateOptionsPositionsBody = {
-                  options: [
-                    { id: dragged.id, position: destination.index },
-                    { id: draggedOver.id, position: source.index },
-                  ],
-                };
-                mutateOptionPositions(body);
-                handlers.setItemProp(
-                  dragged.position,
-                  'position',
-                  destination.index
-                );
-                handlers.setItemProp(
-                  draggedOver.position,
-                  'position',
-                  source.index
-                );
-                handlers.reorder({ from: source.index, to: destination.index });
+                optionListHandlers.reorder({
+                  from: source.index,
+                  to: destination.index,
+                });
+                setIsPositionChange(true);
               }
             }}
           >
@@ -138,7 +176,7 @@ const PollForm = ({
                               autosize
                               value={opt.value}
                               onChange={(e) => {
-                                handlers.setItemProp(
+                                optionListHandlers.setItemProp(
                                   opt.position,
                                   'value',
                                   e.target.value
@@ -179,6 +217,41 @@ const PollForm = ({
               )}
             </Droppable>
           </DragDropContext>
+          {editMode && (
+            <Group align="center" wrap="nowrap">
+              <Tooltip label={addOptionOpen ? 'Close' : 'Add option'}>
+                <Button
+                  className={classes.addOptionBtn}
+                  onClick={toggleAddOption}
+                  size="compact-lg"
+                >
+                  {addOptionOpen ? '-' : '+'}
+                </Button>
+              </Tooltip>
+              {addOptionOpen && (
+                <>
+                  <Textarea rows={1} autosize ref={addOptionRef} />
+                  <ActionIcon
+                    type="submit"
+                    onClick={() => {
+                      const body: UpdateOptionBody = {
+                        value: addOptionRef.current?.value,
+                      };
+                      if (body.value === '') return;
+                      mutateAddOption(body, {
+                        onSuccess: () => {
+                          revalidator.revalidate();
+                          toggleAddOption();
+                        },
+                      });
+                    }}
+                  >
+                    <IconDeviceFloppy />
+                  </ActionIcon>
+                </>
+              )}
+            </Group>
+          )}
         </RadioGroup>
         {!editMode ? (
           <Group
