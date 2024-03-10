@@ -4,7 +4,7 @@ import pollService from '../services/polls';
 import { mutationError, pollEditSuccess } from '../helpers';
 
 const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
-  const { mutate: mutateOptionValue } = useMutation({
+  const { mutate: updateOptionValue } = useMutation({
     mutationFn: (v: { optionID: string; body: UpdateOptionBody }) => {
       let token = '';
       if (pollToken !== undefined) {
@@ -16,7 +16,7 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
     onSuccess: pollEditSuccess.bind(null, 'Saved!'),
   });
 
-  const { mutate: mutateOptionPositions } = useMutation({
+  const { mutate: updateOptionPositions } = useMutation({
     mutationFn: (body: UpdateOptionsPositionsBody) => {
       let token = '';
       if (pollToken !== undefined) {
@@ -28,7 +28,7 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
     onSuccess: pollEditSuccess.bind(null, 'Positions saved!'),
   });
 
-  const { mutate: mutateAddOption } = useMutation({
+  const { mutate: addOption } = useMutation({
     mutationFn: (body: UpdateOptionBody) => {
       let token = '';
       if (pollToken !== undefined) {
@@ -39,11 +39,23 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
     onError: mutationError,
     onSuccess: pollEditSuccess.bind(null, 'Option added!'),
   });
+  const { mutate: deleteOption } = useMutation({
+    mutationFn: (optionID: string) => {
+      let token = '';
+      if (pollToken !== undefined) {
+        token = pollToken;
+      }
+      return pollService.deleteOption(poll.id, optionID, token);
+    },
+    onError: mutationError,
+    onSuccess: pollEditSuccess.bind(null, 'Option deleted!'),
+  });
 
   return {
-    mutateOptionValue,
-    mutateOptionPositions,
-    mutateAddOption,
+    updateOptionValue,
+    updateOptionPositions,
+    addOption,
+    deleteOption,
   };
 };
 

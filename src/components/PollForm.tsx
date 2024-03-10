@@ -21,7 +21,11 @@ import {
   ActionIcon,
 } from '@mantine/core';
 import classes from './PollForm.module.css';
-import { IconDeviceFloppy, IconGripVertical } from '@tabler/icons-react';
+import {
+  IconDeviceFloppy,
+  IconGripVertical,
+  IconTrash,
+} from '@tabler/icons-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useListState } from '@mantine/hooks';
 import useUpdateOptions from '../hooks/useUpdateOptions';
@@ -61,7 +65,7 @@ const PollForm = ({
   );
   const [addOptionOpen, { toggle: toggleAddOption }] = useDisclosure(false);
 
-  const { mutateOptionValue, mutateOptionPositions, mutateAddOption } =
+  const { updateOptionValue, updateOptionPositions, addOption, deleteOption } =
     useUpdateOptions(pollToken, poll);
 
   const addOptionRef = useRef<HTMLTextAreaElement>(null);
@@ -71,15 +75,21 @@ const PollForm = ({
   const [isPositionChange, setIsPositionChange] = useState(false);
 
   if (optionsList.length !== poll.options.length) {
-    const newOption = poll.options.find(
-      (o) => o.position === optionsList.length
-    );
-    newOption &&
-      optionListHandlers.append({
-        id: newOption.id,
-        value: newOption.value,
-        position: newOption.position,
-      });
+    if (optionsList.length > poll.options.length) {
+      optionListHandlers.setState(
+        [...poll.options].sort((a, b) => a.position - b.position)
+      );
+    } else {
+      const newOption = poll.options.find(
+        (o) => o.position === optionsList.length
+      );
+      newOption &&
+        optionListHandlers.append({
+          id: newOption.id,
+          value: newOption.value,
+          position: newOption.position,
+        });
+    }
   }
 
   if (isPositionChange) {
@@ -103,7 +113,7 @@ const PollForm = ({
         position: opt.position,
       })),
     };
-    mutateOptionPositions(body, {
+    updateOptionPositions(body, {
       onSuccess: () => {
         optionListHandlers.applyWhere(
           (opt, i) => opt.position !== i,
@@ -183,23 +193,35 @@ const PollForm = ({
                                 );
                               }}
                             />
-                            <ActionIcon
-                              onClick={() => {
-                                const body: UpdateOptionBody = {
-                                  value: opt.value,
-                                };
-                                const oldOpt = poll.options.find(
-                                  (o) => o.id === opt.id
-                                );
-                                if (body.value === oldOpt?.value) return;
-                                mutateOptionValue({
-                                  optionID: opt.id,
-                                  body: body,
-                                });
-                              }}
-                            >
-                              <IconDeviceFloppy />
-                            </ActionIcon>
+                            <Group align="baseline" wrap="nowrap">
+                              <ActionIcon
+                                onClick={() => {
+                                  const body: UpdateOptionBody = {
+                                    value: opt.value,
+                                  };
+                                  const oldOpt = poll.options.find(
+                                    (o) => o.id === opt.id
+                                  );
+                                  if (body.value === oldOpt?.value) return;
+                                  updateOptionValue({
+                                    optionID: opt.id,
+                                    body: body,
+                                  });
+                                }}
+                              >
+                                <IconDeviceFloppy />
+                              </ActionIcon>
+                              <ActionIcon
+                                color="red.6"
+                                onClick={() => {
+                                  deleteOption(opt.id, {
+                                    onSuccess: () => revalidator.revalidate(),
+                                  });
+                                }}
+                              >
+                                <IconTrash />
+                              </ActionIcon>
+                            </Group>
                           </Group>
                         )}
                       </Draggable>
@@ -238,7 +260,7 @@ const PollForm = ({
                         value: addOptionRef.current?.value,
                       };
                       if (body.value === '') return;
-                      mutateAddOption(body, {
+                      addOption(body, {
                         onSuccess: () => {
                           revalidator.revalidate();
                           toggleAddOption();
