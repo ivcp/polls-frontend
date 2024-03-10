@@ -108,6 +108,20 @@ const updateOptionsPositions = async (
     body: JSON.stringify(body),
   });
 };
+const addOption = async (
+  pollID: string,
+  body: UpdateOptionBody,
+  token: string
+) => {
+  return await fetchData(`/v1/polls/${pollID}/options`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  });
+};
 
 export default {
   listPolls,
@@ -118,4 +132,5 @@ export default {
   editPoll,
   updateOptionValue,
   updateOptionsPositions,
+  addOption,
 };

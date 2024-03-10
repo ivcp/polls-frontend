@@ -28,9 +28,22 @@ const useUpdateOptions = (pollToken: string | undefined, poll: Poll) => {
     onSuccess: pollEditSuccess.bind(null, 'Positions saved!'),
   });
 
+  const { mutate: mutateAddOption } = useMutation({
+    mutationFn: (body: UpdateOptionBody) => {
+      let token = '';
+      if (pollToken !== undefined) {
+        token = pollToken;
+      }
+      return pollService.addOption(poll.id, body, token);
+    },
+    onError: mutationError,
+    onSuccess: pollEditSuccess.bind(null, 'Option added!'),
+  });
+
   return {
     mutateOptionValue,
     mutateOptionPositions,
+    mutateAddOption,
   };
 };
 
