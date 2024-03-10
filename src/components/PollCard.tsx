@@ -153,6 +153,9 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           ) : (
             <Title order={2} ta="center">
               {poll.question}
+              <sup className={classes.star}>
+                {new Date(poll.created_at) < new Date(poll.updated_at) && '*'}
+              </sup>
             </Title>
           )
         ) : (
@@ -264,7 +267,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             <Text size="xs" c="dimmed">
               <strong>Edited:</strong>{' '}
               {new Date(poll.created_at) < new Date(poll.updated_at)
-                ? new Date(poll.updated_at).toLocaleString()
+                ? new Date(poll.updated_at).toLocaleString() + '*'
                 : 'No'}
             </Text>
             {editMode ? (
