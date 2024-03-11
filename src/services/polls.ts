@@ -144,6 +144,16 @@ const deletePoll = async (pollID: string, token: string) => {
   });
 };
 
+const search = async (
+  pageNumber: number,
+  query: string
+): Promise<PollsResponse> => {
+  return await fetchData(
+    `/v1/polls${'?page_size=10&page=' + pageNumber + '&search=' + query}`,
+    undefined
+  );
+};
+
 export default {
   listPolls,
   getPoll,
@@ -156,4 +166,5 @@ export default {
   addOption,
   deleteOption,
   deletePoll,
+  search,
 };

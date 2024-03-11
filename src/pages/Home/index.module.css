@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 1rem;
 }
 
 .center {
@@ -16,4 +16,19 @@
 
 .pagination {
   align-self: center;
+}
+
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.results {
+  align-self: flex-start;
+  width: 100%;
+  padding-inline: 1rem;
 }
