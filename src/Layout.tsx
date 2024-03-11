@@ -5,7 +5,7 @@ import { AppShell, Burger, Group, Title, UnstyledButton } from '@mantine/core';
 import classes from './Layout.module.css';
 
 function Layout() {
-  const [opened, { toggle }] = useDisclosure();
+  const [opened, { toggle, close }] = useDisclosure();
 
   return (
     <AppShell
@@ -25,19 +25,30 @@ function Layout() {
               <Title size={'sm'}>POLLS</Title>
             </Link>
             <Group ml="xl" gap={0} visibleFrom="sm">
-              <UnstyledButton className={classes.control}>New</UnstyledButton>
-              <UnstyledButton className={classes.control}>
-                Browse
-              </UnstyledButton>
+              <Link to={'/new'} className={classes.linkTitle}>
+                <UnstyledButton className={classes.control}>New</UnstyledButton>
+              </Link>
+              <Link to={'/'} className={classes.linkTitle}>
+                <UnstyledButton className={classes.control}>
+                  Home
+                </UnstyledButton>
+              </Link>
             </Group>
           </Group>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar py="md" px={4}>
-        <UnstyledButton className={classes.control}>New</UnstyledButton>
-        <UnstyledButton className={classes.control}>Browse</UnstyledButton>
+        <Link to={'/new'} className={classes.linkTitle}>
+          <UnstyledButton onClick={close} className={classes.control}>
+            New
+          </UnstyledButton>
+        </Link>
+        <Link to={'/'} className={classes.linkTitle}>
+          <UnstyledButton onClick={close} className={classes.control}>
+            Home
+          </UnstyledButton>
+        </Link>
       </AppShell.Navbar>
-
       <AppShell.Main className={classes.main}>
         <Outlet />
       </AppShell.Main>
