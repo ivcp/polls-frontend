@@ -16,7 +16,11 @@ import {
 } from '@mantine/core';
 import classes from './index.module.css';
 import { Link } from 'react-router-dom';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconSearch,
+} from '@tabler/icons-react';
 import useSearch from '../../hooks/useSearch';
 
 export default function Polls() {
@@ -49,17 +53,17 @@ export default function Polls() {
           Create poll
         </Button>
       </div>
-      <Group justify="space-between">
-        <Text>Latest:</Text>
-        <Group>
-          <TextInput
-            placeholder="Search polls"
-            ref={searchRef}
-            onKeyUp={(e) => e.key === 'Enter' && search()}
-          />
-          <Button onClick={search}>Search</Button>
-        </Group>
+      <Group className={classes.search}>
+        <TextInput
+          placeholder="Search polls"
+          ref={searchRef}
+          onKeyUp={(e) => e.key === 'Enter' && search()}
+        />
+        <ActionIcon size="lg" variant="light" onClick={search}>
+          <IconSearch />
+        </ActionIcon>
       </Group>
+      <Text>Latest:</Text>
       <Grid>
         {isLoading && (
           <>
