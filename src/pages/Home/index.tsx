@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import pollService from '../../services/polls';
 import PollCard from '../../components/PollCard';
@@ -16,8 +16,8 @@ import {
 } from '@mantine/core';
 import classes from './index.module.css';
 import { Link } from 'react-router-dom';
-import { useDisclosure } from '@mantine/hooks';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import useSearch from '../../hooks/useSearch';
 
 export default function Polls() {
   const [activePage, setPage] = useState(1);
@@ -26,34 +26,20 @@ export default function Polls() {
     queryFn: pollService.listPolls.bind(null, activePage),
   });
 
-  const searchRef = useRef<HTMLInputElement>(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [searchPage, setSearchPage] = useState(1);
-  const [isSearchOpen, { open: openSearch, close: closeSearch }] =
-    useDisclosure(false);
-
   const {
-    isSuccess: isSearchSuccess,
-    isLoading: isSearchLoading,
-    isError: isSearchError,
-    error: searchError,
-    data: searchData,
-  } = useQuery({
-    queryKey: ['search', searchValue, searchPage],
-    queryFn: pollService.search.bind(null, searchPage, searchValue),
-    enabled: !!searchValue,
-  });
-
-  const search = () => {
-    if (
-      searchRef.current?.value &&
-      searchRef.current.value.trim() !== '' &&
-      !searchRef.current.value.startsWith('&')
-    ) {
-      openSearch();
-      setSearchValue(searchRef.current.value);
-    }
-  };
+    searchRef,
+    searchValue,
+    setSearchValue,
+    setSearchPage,
+    isSearchOpen,
+    closeSearch,
+    isSearchSuccess,
+    isSearchLoading,
+    isSearchError,
+    searchError,
+    searchData,
+    search,
+  } = useSearch();
 
   return (
     <div className={`${classes.container} ${isLoading && classes.center}`}>
@@ -131,9 +117,9 @@ export default function Polls() {
             for "{searchValue}"
           </Text>
           {isSearchLoading && <Text>searching...</Text>}
-          {isSearchError && <Text>Error: {searchError.message}</Text>}
+          {isSearchError && <Text>Error: {searchError?.message}</Text>}
           {isSearchSuccess &&
-            searchData.polls.map((poll) => (
+            searchData?.polls.map((poll) => (
               <Stack key={poll.id} className={classes.results}>
                 <Link className={classes.link} to={`/${poll.id}`}>
                   <Group justify="space-between" wrap="nowrap">
@@ -144,13 +130,17 @@ export default function Polls() {
               </Stack>
             ))}
           {isSearchSuccess &&
+            // @ts-expect-error: searchData is possibly undefined with custom hook
             searchData.metadata.total_records >
+              // @ts-expect-error: searchData is possibly undefined with custom hook
               searchData.metadata.page_size && (
               <Group>
                 <ActionIcon
                   variant="outline"
+                  // @ts-expect-error: searchData is possibly undefined with custom hook
                   disabled={searchData.metadata.current_page === 1}
                   onClick={() =>
+                    // @ts-expect-error: searchData is possibly undefined with custom hook
                     setSearchPage(searchData.metadata.current_page - 1)
                   }
                 >
@@ -159,10 +149,13 @@ export default function Polls() {
                 <ActionIcon
                   variant="outline"
                   disabled={
+                    // @ts-expect-error: searchData is possibly undefined with custom hook
                     searchData.metadata.current_page ===
+                    // @ts-expect-error: searchData is possibly undefined with custom hook
                     searchData.metadata.last_page
                   }
                   onClick={() =>
+                    // @ts-expect-error: searchData is possibly undefined with custom hook
                     setSearchPage(searchData.metadata.current_page + 1)
                   }
                 >
