@@ -8,12 +8,10 @@
   align-items: center;
 }
 
-.titleContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.createBtn {
+  align-self: center;
+  margin-top: 2rem;
 }
-
 .pagination {
   align-self: center;
 }

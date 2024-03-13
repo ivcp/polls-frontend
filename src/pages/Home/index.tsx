@@ -47,12 +47,15 @@ export default function Polls() {
 
   return (
     <div className={`${classes.container} ${isLoading && classes.center}`}>
-      <div className={classes.titleContainer}>
-        <p>Create a poll and share with others.</p>
-        <Button component={Link} to={'/new'} size="lg">
-          Create poll
-        </Button>
-      </div>
+      <Button
+        className={classes.createBtn}
+        component={Link}
+        to={'/new'}
+        size="lg"
+      >
+        Create poll
+      </Button>
+
       <Group className={classes.search}>
         <TextInput
           placeholder="Search polls"
