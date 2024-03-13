@@ -13,7 +13,7 @@ export default defineConfig(({ command, mode }) => {
       server: {
         proxy: {
           '/v1': {
-            target: isDev ? 'http://localhost' : 'http://3.75.231.58',
+            target: isDev ? 'http://localhost' : 'https://api.polls.ovh',
           },
         },
       },

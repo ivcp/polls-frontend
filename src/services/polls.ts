@@ -9,8 +9,13 @@ import {
   UpdateOptionsPositionsBody,
 } from '../types';
 
+let baseUrl = '';
+if (import.meta.env.PROD) {
+  baseUrl = 'https://api.polls.ovh';
+}
+
 const fetchData = async (url: string, config: RequestInit | undefined) => {
-  const response = await fetch(url, config);
+  const response = await fetch(baseUrl + url, config);
   if (!response.ok) {
     if (response.status === 422) {
       const err: {
