@@ -254,7 +254,6 @@ const PollForm = ({
                 <>
                   <Textarea rows={1} autosize ref={addOptionRef} />
                   <ActionIcon
-                    type="submit"
                     onClick={() => {
                       const body: UpdateOptionBody = {
                         value: addOptionRef.current?.value,
