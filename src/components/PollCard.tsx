@@ -95,7 +95,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
 
   return (
     <Card
-      shadow="sm"
+      withBorder
       className={`${classes.container} ${details ? classes.noGap : ''}`}
       maw={details ? '45rem' : undefined}
       ml={details ? 'auto' : undefined}

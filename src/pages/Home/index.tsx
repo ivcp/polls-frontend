@@ -119,8 +119,8 @@ export default function Polls() {
               : 0}{' '}
             {searchData?.metadata.total_records &&
             searchData.metadata.total_records === 1
-              ? 'match'
-              : 'matches'}{' '}
+              ? 'result'
+              : 'results'}{' '}
             for "{searchValue}"
           </Text>
           {isSearchLoading && <Text>searching...</Text>}

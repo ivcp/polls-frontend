@@ -1,11 +1,21 @@
 import { Link, Outlet } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
-import { AppShell, Burger, Group, Title, UnstyledButton } from '@mantine/core';
+import {
+  ActionIcon,
+  AppShell,
+  Burger,
+  Group,
+  Title,
+  UnstyledButton,
+  useMantineColorScheme,
+} from '@mantine/core';
+import { IconSun, IconMoon } from '@tabler/icons-react';
 
 import classes from './Layout.module.css';
 
 function Layout() {
   const [opened, { toggle, close }] = useDisclosure();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   return (
     <AppShell
@@ -24,7 +34,15 @@ function Layout() {
             <Link to={'/'} className={classes.linkTitle}>
               <Title size={'sm'}>POLLS</Title>
             </Link>
-            <Group ml="xl" gap={0} visibleFrom="sm">
+            <ActionIcon
+              ml="auto"
+              variant="transparent"
+              color="white.6"
+              onClick={toggleColorScheme}
+            >
+              {colorScheme === 'dark' ? <IconSun /> : <IconMoon />}
+            </ActionIcon>
+            <Group gap={0} visibleFrom="sm">
               <Link to={'/new'} className={classes.linkTitle}>
                 <UnstyledButton className={classes.control}>New</UnstyledButton>
               </Link>
