@@ -10,6 +10,7 @@ import {
   Textarea,
   Button,
   Modal,
+  Box,
 } from '@mantine/core';
 import { Poll } from '../types';
 import classes from './PollCard.module.css';
@@ -30,6 +31,7 @@ import pollService from '../services/polls';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useDisclosure } from '@mantine/hooks';
+import { useMeasure } from '@uidotdev/usehooks';
 
 const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
   const pollToken = Cookies.get(poll.id);
@@ -79,13 +81,16 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
 
   const voteBtnDisabled = checkExpired(poll);
 
-  let chartHeight = 80;
+  const [formRef, { height: formHeight }] = useMeasure();
 
+  let chartHeight = details ? 100 : 80;
+  const chartContainerHeight = formHeight;
   if (isResultsSuccess) {
     // @ts-expect-error: data is possibly undefined with custom hook
-    resultsData.results.length > 2 &&
+    if (resultsData.results.length > 2) {
       // @ts-expect-error: data is possibly undefined with custom hook
-      (chartHeight = 40 * (resultsData.results.length - 2) + 80);
+      chartHeight = 40 * (resultsData.results.length - 2) + chartHeight;
+    }
   }
   const tickFormatter = (value: string) => {
     const limit = 18;
@@ -193,6 +198,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       <Card.Section w={'100%'}>
         {!showResults ? (
           <PollForm
+            formRef={formRef}
             poll={poll}
             voteBtnDisabled={voteBtnDisabled}
             refetchResults={refetchResults}
@@ -206,6 +212,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           />
         ) : editMode ? (
           <PollForm
+            formRef={formRef}
             poll={poll}
             voteBtnDisabled={voteBtnDisabled}
             refetchResults={refetchResults}
@@ -218,7 +225,9 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             pollToken={pollToken}
           />
         ) : (
-          <div>
+          <Box
+            h={chartContainerHeight !== null ? chartContainerHeight : undefined}
+          >
             {isResultsError && (
               <Text size="1.4rem" p={'lg'} ta={'center'}>
                 {
@@ -230,13 +239,13 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             {isResultsLoading && (
               <>
                 {poll.options.map((opt) => (
-                  <Skeleton key={opt.id} height={35} radius="xl" mb={'xs'} />
+                  <Skeleton key={opt.id} height={35} radius="xl" mb={'md'} />
                 ))}
               </>
             )}
             {isResultsSuccess && (
               <BarChart
-                mt="xs"
+                pt={details ? 'md' : undefined}
                 h={chartHeight}
                 withXAxis={false}
                 tickLine="none"
@@ -248,6 +257,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                 dataKey="value"
                 series={[{ name: 'vote_count', color: 'blue.6' }]}
                 orientation="vertical"
+                //  barChartProps={{ barCategoryGap: 20 }}
                 barProps={{
                   radius: [0, 8, 8, 0],
                   label: { fill: '#eeeeee', fontSize: 14, fontWeight: 600 },
@@ -258,10 +268,9 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
                 pl={details ? '1rem' : undefined}
               />
             )}
-          </div>
+          </Box>
         )}
       </Card.Section>
-
       <Group gap={'4rem'}>
         {showResults && !editMode && (
           <ActionIcon variant="light" onClick={() => setShowResults(false)}>
@@ -326,7 +335,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
           </Stack>
         ) : (
           <Link to={`/${poll.id}`}>
-            <Text size="xs" className={classes.seeMore}>
+            <Text size="xs" h={'28'} pt="5" className={classes.seeMore}>
               see more details
             </Text>
           </Link>

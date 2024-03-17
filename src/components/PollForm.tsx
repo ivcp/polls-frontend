@@ -46,6 +46,7 @@ type PollFormProps = {
   details: boolean;
   editMode: boolean;
   pollToken: string | undefined;
+  formRef: (instance: Element | null) => void;
 };
 
 const PollForm = ({
@@ -59,6 +60,7 @@ const PollForm = ({
   details,
   editMode,
   pollToken,
+  formRef,
 }: PollFormProps) => {
   const [optionsList, optionListHandlers] = useListState(
     [...poll.options].sort((a, b) => a.position - b.position)
@@ -134,6 +136,7 @@ const PollForm = ({
 
   return (
     <form
+      ref={formRef}
       onSubmit={(e) => {
         e.preventDefault();
         if (selectedOption === '') return;

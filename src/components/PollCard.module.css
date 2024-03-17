@@ -36,3 +36,7 @@
 .timeDetails {
   align-self: flex-end;
 }
+
+.invisible {
+  visibility: hidden;
+}
