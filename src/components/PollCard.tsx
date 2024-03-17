@@ -204,6 +204,19 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
             editMode={editMode}
             pollToken={pollToken}
           />
+        ) : editMode ? (
+          <PollForm
+            poll={poll}
+            voteBtnDisabled={voteBtnDisabled}
+            refetchResults={refetchResults}
+            selectedOption={selectedOption}
+            vote={vote}
+            setSelectedOption={setSelectedOption}
+            setShowResults={setShowResults}
+            details={details}
+            editMode={editMode}
+            pollToken={pollToken}
+          />
         ) : (
           <div>
             {isResultsError && (
@@ -250,7 +263,7 @@ const PollCard = ({ poll, details }: { poll: Poll; details: boolean }) => {
       </Card.Section>
 
       <Group gap={'4rem'}>
-        {showResults && (
+        {showResults && !editMode && (
           <ActionIcon variant="light" onClick={() => setShowResults(false)}>
             <IconArrowNarrowLeft />
           </ActionIcon>
